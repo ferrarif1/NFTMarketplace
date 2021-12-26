@@ -2,11 +2,12 @@
 pragma solidity ^0.8.0;
 
 import "./SummerNFT.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract SummerNFTMarketplace {
+contract SummerNFTMarketplace is Ownable {
   
   mapping (uint => _Offer[]) public tokenIdToOffers;
-  mapping (uint => _bestPrice) public tokenIdToBestPrice;
+  mapping (uint => uint) public tokenIdToBestPrice;
   mapping (address => uint) public userFunds;
   /*
   England -> increase price    (* Default *)
@@ -14,7 +15,7 @@ contract SummerNFTMarketplace {
   Simple -> Fixed price
   */
   enum AuctionsType {England, Netherlands, Simple}
-  AuctionsType _auctionsType = England;
+  AuctionsType _auctionsType = AuctionsType.England;
 
   SummerNFT summerNFT;
   
@@ -45,10 +46,20 @@ contract SummerNFTMarketplace {
   }
 
   modifier onlyOwnerOf(uint _NFTid){
-      require(msg.sender == summerNFT.ownerOf[_NFTid]);
+      address ownerOfNFT =  summerNFT.ownerOf(_NFTid);
+      require(msg.sender == ownerOfNFT);
       _;
   }
 
+  function setAuctionsType(uint _typeNum) public onlyOwner{
+     if(_typeNum == 0){
+        _auctionsType = AuctionsType.England;
+     }else if(_typeNum == 1){
+       _auctionsType = AuctionsType.Netherlands;
+     }else{
+       _auctionsType = AuctionsType.Simple;
+     }
+  }
 /*
   add to sell list and set start price
 */
@@ -61,10 +72,10 @@ contract SummerNFTMarketplace {
 */
   function makeOffer(uint _id, uint _price) public {
     //1.if new price is the best price
-    uint memory _currentBestPrice = tokenIdToBestPrice[_id];
-    if(_auctionsType == England){
+    uint  _currentBestPrice = tokenIdToBestPrice[_id];
+    if(_auctionsType == AuctionsType.England){
       require(_price > _currentBestPrice);
-    }else if(_auctionsType == Netherlands){//if Netherlands, Offers are made by owner
+    }else if(_auctionsType == AuctionsType.Netherlands){//if Netherlands, Offers are made by owner
       require(_price < _currentBestPrice);
     }
     //2.set new best price
@@ -81,30 +92,44 @@ contract SummerNFTMarketplace {
 /*
 fill Offer
 */
-  function fillOffer(uint _offerId) public payable {
-    _Offer storage _offer = tokenIdToOffers[_offerId];
-    require(_offer.offerId == _offerId, 'The offer must exist');
-    require(_offer.user != msg.sender, 'The owner of the offer cannot fill it');
-    require(!_offer.fulfilled, 'An offer cannot be fulfilled twice');
-    require(!_offer.cancelled, 'A cancelled offer cannot be fulfilled');
-    require(msg.value == _offer.price, 'The ETH amount should match with the NFT Price');
-    summerNFT.transferFrom(address(this), msg.sender, _offer.id);
-    _offer.fulfilled = true;
-    userFunds[_offer.user] += msg.value;
-    emit OfferFilled(_offerId, _offer.id, msg.sender);
+  function fillOffer(uint _offerId, uint _tokenId) public payable{
+    _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
+    require(offersOfId.length > 0, 'No Offer exist');
+    _Offer memory currentOffer = _Offer(0, 0, msg.sender, 0, false, false);
+    for(uint index = 0; index < offersOfId.length; index++){
+      _Offer memory offerIndex = offersOfId[index];
+      if(offerIndex.offerId == _offerId){
+        currentOffer = offerIndex;
+      }
+    }
+    require(currentOffer.offerId == _offerId, 'The offer must exist');
+    require(!currentOffer.fulfilled, 'An offer cannot be fulfilled twice');
+    require(!currentOffer.cancelled, 'A cancelled offer cannot be fulfilled');
+    require(msg.value == currentOffer.price, 'The ETH amount should match with the NFT Price');
+    summerNFT.transferFrom(address(this), msg.sender, currentOffer.id);
+    currentOffer.fulfilled = true;
+    userFunds[currentOffer.user] += msg.value;
+    emit OfferFilled(_offerId, currentOffer.id, msg.sender);
   }
 /*
 cancel Offer
 */
-  function cancelOffer(uint _offerId) public {
-    _Offer storage _offer = tokenIdToOffers[_offerId];
-    require(_offer.offerId == _offerId, 'The offer must exist');
-    require(_offer.user == msg.sender, 'The offer can only be canceled by the owner');
-    require(_offer.fulfilled == false, 'A fulfilled offer cannot be cancelled');
-    require(_offer.cancelled == false, 'An offer cannot be cancelled twice');
-    summerNFT.transferFrom(address(this), msg.sender, _offer.id);
-    _offer.cancelled = true;
-    emit OfferCancelled(_offerId, _offer.id, msg.sender);
+  function cancelOffer(uint _offerId, uint _tokenId) public  onlyOwnerOf(_tokenId){
+    _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
+    require(offersOfId.length > 0, 'No Offer exist');
+    _Offer memory currentOffer = _Offer(0, 0, msg.sender, 0, false, false);
+    for(uint index = 0; index < offersOfId.length; index++){
+      _Offer memory offerIndex = offersOfId[index];
+      if(offerIndex.offerId == _offerId){
+        currentOffer = offerIndex;
+      }
+    }
+    require(currentOffer.offerId == _offerId, 'The offer must exist');
+    require(currentOffer.fulfilled == false, 'A fulfilled offer cannot be cancelled');
+    require(currentOffer.cancelled == false, 'An offer cannot be cancelled twice');
+    summerNFT.transferFrom(address(this), msg.sender, currentOffer.id);
+    currentOffer.cancelled = true;
+    emit OfferCancelled(_offerId, currentOffer.id, msg.sender);
   }
 /*
 claim Funds

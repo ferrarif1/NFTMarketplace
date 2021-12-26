@@ -188,6 +188,24 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_offerId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "cancelOfferAndWithdrawFromSellList",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "claimFunds",
 				"outputs": [],
@@ -226,6 +244,24 @@
 					}
 				],
 				"name": "makeOffer",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_price",
+						"type": "uint256"
+					}
+				],
+				"name": "makeOfferWithUserFunds",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -361,6 +397,19 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_id",
+						"type": "uint256"
+					}
+				],
+				"name": "withdrawNFTFromSellList",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			}
 		],
@@ -506,11 +555,11 @@
 			]
 		},
 		"contracts/SummerNFTMarketplace.sol": {
-			"keccak256": "0xd2992c265ff52778709f9512bf959dcd7ebae594ae17b602caf7605b5d994bf0",
+			"keccak256": "0xfb4102cf0f54b62b304f1510e8ad0904644f0173c64ee8b1699f3d6fcea79704",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://6111200fd5434f8130a8f4106d14a40a7934b51a388d521afb321acbecd12ead",
-				"dweb:/ipfs/QmeSwZV6oHqGCK8215XcJqezZqenUVXRuGMVZDy8hTbuK1"
+				"bzz-raw://450783001af11a050c444ae0ef4119a45c94890a745cdcb1d2b0e92b4e6fc7c8",
+				"dweb:/ipfs/Qmbp1ArVa8d9HwiEHUGdv1GvgjHoSGXAdsVyvL3tjUFBJZ"
 			]
 		}
 	},

@@ -488,7 +488,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/SummerNFT.sol": "NFTCollection"
+			"contracts/SummerNFT.sol": "SummerNFT"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -591,11 +591,11 @@
 			]
 		},
 		"contracts/SummerNFT.sol": {
-			"keccak256": "0xc79f2cbb28e2706d27c82cbe9c2eff01e07b878cf3b2676dc1d10946467c0f73",
+			"keccak256": "0x2ed8710a5a5ecbbc8c1aac2e092aa6dfe1a0cbf3bd01b31c50337d8a4e18b0d5",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e5e589fbbf487690926f1b9f4fa7642c445f9dd1dbc10ad1b59357b1a793c744",
-				"dweb:/ipfs/Qmb7Miofv6D9Fm9Lkh4eEuN2mfytzW17JX3rY5LNu9aJFB"
+				"bzz-raw://6e754ca6ade6a2d743c2287692043f0e8716762344045cb69ef9de85e664650e",
+				"dweb:/ipfs/QmTGXzEpeQUeMRMGVJDKFQ3SGgNu5dgha56Mr7NgF5Bafq"
 			]
 		}
 	},

@@ -51,6 +51,11 @@ contract SummerNFTMarketplace is Ownable {
       _;
   }
 
+  function ownerOfNFTId(uint _NFTid)public view returns(address memory){
+    address ownerOfNFT =  summerNFT.ownerOf(_NFTid);
+    return ownerOfNFT;
+  }
+
  
 /*
   add to sell list and set start price, choose AuctionsType
@@ -148,10 +153,10 @@ function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOwn
   }
 
 /*
-fill Offer
+fill Offer by nft owner
 accept one offer and reject others
 */
-  function fillOffer(uint _offerId, uint _tokenId) public payable{
+  function fillOfferByOwner(uint _offerId, uint _tokenId) public payable onlyOwnerOf(_tokenId){
     _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
     require(offersOfId.length > 0, 'No Offer exist');
     _Offer memory currentOffer = _Offer(0, 0, msg.sender, 0, false, false);
@@ -178,6 +183,7 @@ accept one offer and reject others
       }
     }
   }
+
 /*
 cancel Offer
 reject the best offer and cancel other offers
@@ -203,6 +209,30 @@ only cancel, still on sale(NFT hold by contract)
       userFunds[offerIndex.user] = offerIndex.price;
     }
     emit OfferCancelled(_offerId, currentOffer.id, msg.sender);
+  }
+
+/*
+simple buy NFT without offer
+*/
+function simpleBuyNFT(uint _tokenId) public payable{
+    //0.only for AuctionsType.Simple
+    AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
+    require(_auctionsType == AuctionsType.Simple);
+    //1.if new price match the best price
+    uint  _currentBestPrice = tokenIdToBestPrice[_id];
+    require(msg.value == _currentBestPrice);
+    //2.transfer nft
+    summerNFT.transferFrom(address(this), msg.sender, _tokenId);
+    //3.update userFunds for nft owner
+    address ownerOfNFT =  summerNFT.ownerOf(_NFTid);
+    userFunds[ownerOfNFT] += msg.value;
+    //4.cancel other offers , refund or update userFunds
+    _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
+    for(uint index = 0; index < offersOfId.length; index++){
+      _Offer memory offerIndex = offersOfId[index];
+      offerIndex.cancelled = true;
+      userFunds[offerIndex.user] = offerIndex.price;
+    }
   }
 /*
 cancel Offer and withdraw NFT from contract

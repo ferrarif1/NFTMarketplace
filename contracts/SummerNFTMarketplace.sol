@@ -71,9 +71,29 @@ contract SummerNFTMarketplace is Ownable {
   function withdrawNFTFromSellList(uint _id) public onlyOwnerOf(_id){
     summerNFT.transferFrom(address(this), msg.sender, _id);
   }
-
+/*
+  decrease price for AuctionsType.Netherlands
+*/
+  function decreasePriceForNetherlandsAuctionsType(uint _id,  uint _price) public onlyOwnerOf(_id){
+     AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
+     require(_auctionsType == AuctionsType.Netherlands);
+     uint  _currentBestPrice = tokenIdToBestPrice[_id];
+     require(_price <= _currentBestPrice, 'The new price should be lesser than current best price given by owner of nft');
+     tokenIdToBestPrice[_id] = _price;
+  }
+  /*
+   change price for AuctionsType.Simple
+  */
+function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOwnerOf(_id){
+     AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
+     require(_auctionsType == AuctionsType.Simple);
+     uint  _currentBestPrice = tokenIdToBestPrice[_id];
+     tokenIdToBestPrice[_id] = _price;
+  }
 /*
   give offer, send eth to contract
+  英格兰拍卖：nft owner设置初始起拍价格，竞拍者逐步提高价格发起offer，价高者得
+  荷兰拍卖： nft owner设置初始价格，竞拍者给出满足该价格的offer或者价格更低的offer，nft owner可以主动降价，直到有双方都满意的价格出现
 */
   function makeOffer(uint _id, uint _price) public payable{
     //0.check amount
@@ -83,20 +103,22 @@ contract SummerNFTMarketplace is Ownable {
     AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
     if(_auctionsType == AuctionsType.England){
       require(_price > _currentBestPrice, 'The new price should be largger than current best price');
-    }else if(_auctionsType == AuctionsType.Netherlands){//if Netherlands, Offers are made by owner
-      require(_price < _currentBestPrice, 'The new price should be lesser than current best price');
+      //2.set new best price
+      tokenIdToBestPrice[_id] = _price;
+    }else if(_auctionsType == AuctionsType.Netherlands){
+      require(_price <= _currentBestPrice, 'The new price should be lesser than/equal to current best price given by owner of nft');
     }
-    //2.set new best price
-    tokenIdToBestPrice[_id] = _price;
     //3.add new offer to offerlist
-    _Offer[] storage offersOfId = tokenIdToOffers[_id];
-    uint offerCount = offersOfId.length;
-    offerCount ++;
-    offersOfId[offersOfId.length] = _Offer(offerCount, _id, msg.sender, _price, false, false);
-    tokenIdToOffers[_id] = offersOfId;
-    //4.emit event
-    emit Offer(offerCount, _id, msg.sender, _price, false, false);
+      _Offer[] storage offersOfId = tokenIdToOffers[_id];
+      uint offerCount = offersOfId.length;
+      offerCount ++;
+      offersOfId[offersOfId.length] = _Offer(offerCount, _id, msg.sender, _price, false, false);
+      tokenIdToOffers[_id] = offersOfId;
+      //4.emit event
+      emit Offer(offerCount, _id, msg.sender, _price, false, false);
+    
   }
+
 /*
   give offer, pay with funds
 */
@@ -109,12 +131,12 @@ contract SummerNFTMarketplace is Ownable {
     uint  _currentBestPrice = tokenIdToBestPrice[_id];
     AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
     if(_auctionsType == AuctionsType.England){
-      require(_price > _currentBestPrice);
-    }else if(_auctionsType == AuctionsType.Netherlands){//if Netherlands, Offers are made by owner
-      require(_price < _currentBestPrice);
+      require(_price > _currentBestPrice, 'The new price should be largger than current best price');
+       //2.set new best price
+      tokenIdToBestPrice[_id] = _price;
+    }else if(_auctionsType == AuctionsType.Netherlands){
+      require(_price <= _currentBestPrice, 'The new price should be lesser/equal to current best price given by owner of nft');
     }
-    //2.set new best price
-    tokenIdToBestPrice[_id] = _price;
     //3.add new offer to offerlist
     _Offer[] storage offersOfId = tokenIdToOffers[_id];
     uint offerCount = offersOfId.length;
@@ -158,7 +180,7 @@ accept one offer and reject others
   }
 /*
 cancel Offer
-reject the best offer and cancel all the offer
+reject the best offer and cancel other offers
 only cancel, still on sale(NFT hold by contract)
 */
   function cancelOffer(uint _offerId, uint _tokenId) public  onlyOwnerOf(_tokenId){

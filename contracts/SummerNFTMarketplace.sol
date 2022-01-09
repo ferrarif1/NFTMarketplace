@@ -5,18 +5,18 @@ import "./SummerNFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SummerNFTMarketplace is Ownable {
-  
-  mapping (uint => _Offer[]) public tokenIdToOffers;
-  mapping (uint => uint) public tokenIdToBestPrice;
-  mapping (address => uint) public userFunds;
   /*
   England -> increase price    (* Default *)
   Netherlands -> decrease price
   Simple -> Fixed price
   */
   enum AuctionsType {England, Netherlands, Simple}
-  AuctionsType _auctionsType = AuctionsType.England;
 
+  mapping (uint => _Offer[]) public tokenIdToOffers;
+  mapping (uint => uint) public tokenIdToBestPrice;
+  mapping (address => uint) public userFunds;
+  mapping (address => AuctionsType) public tokenIdToAuctionsType;
+  
   SummerNFT summerNFT;
   
   struct _Offer {
@@ -51,21 +51,20 @@ contract SummerNFTMarketplace is Ownable {
       _;
   }
 
-  function setAuctionsType(uint _typeNum) public onlyOwner{
-     if(_typeNum == 0){
-        _auctionsType = AuctionsType.England;
-     }else if(_typeNum == 1){
-       _auctionsType = AuctionsType.Netherlands;
-     }else{
-       _auctionsType = AuctionsType.Simple;
-     }
-  }
+ 
 /*
-  add to sell list and set start price
+  add to sell list and set start price, choose AuctionsType
   withdraw NFT from sell list
 */
-  function addNFTToSellList(uint _id, uint _price) public onlyOwnerOf(_id){
+  function addNFTToSellList(uint _id, uint _price, uint _typeNum) public onlyOwnerOf(_id){
      summerNFT.transferFrom(msg.sender, address(this), _id); 
+     if(_typeNum == 0){
+        tokenIdToAuctionsType[_id] = AuctionsType.England;
+     }else if(_typeNum == 1){
+       tokenIdToAuctionsType[_id] = AuctionsType.Netherlands;
+     }else{
+       tokenIdToAuctionsType[_id] = AuctionsType.Simple;
+     }
      tokenIdToBestPrice[_id] = _price;
   }
 
@@ -79,12 +78,13 @@ contract SummerNFTMarketplace is Ownable {
   function makeOffer(uint _id, uint _price) public payable{
     //0.check amount
     require(msg.value == _price, 'The ETH amount should match with the offer Price');
-    //1.if new price is the best price
+    //1.if new price should be the best price
     uint  _currentBestPrice = tokenIdToBestPrice[_id];
+    AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
     if(_auctionsType == AuctionsType.England){
-      require(_price > _currentBestPrice);
+      require(_price > _currentBestPrice, 'The new price should be largger than current best price');
     }else if(_auctionsType == AuctionsType.Netherlands){//if Netherlands, Offers are made by owner
-      require(_price < _currentBestPrice);
+      require(_price < _currentBestPrice, 'The new price should be lesser than current best price');
     }
     //2.set new best price
     tokenIdToBestPrice[_id] = _price;
@@ -107,6 +107,7 @@ contract SummerNFTMarketplace is Ownable {
     userFunds[msg.sender] = newbalance; 
     //1.if new price is the best price
     uint  _currentBestPrice = tokenIdToBestPrice[_id];
+    AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
     if(_auctionsType == AuctionsType.England){
       require(_price > _currentBestPrice);
     }else if(_auctionsType == AuctionsType.Netherlands){//if Netherlands, Offers are made by owner

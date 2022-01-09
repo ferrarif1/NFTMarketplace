@@ -6,9 +6,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SummerNFTMarketplace is Ownable {
   /*
-  England -> increase price    (* Default *)
+  England -> increase price    (* Default *) 
   Netherlands -> decrease price
   Simple -> Fixed price
+
+  英格兰拍卖：nft owner设置初始起拍价格，竞拍者逐步提高价格发起offer，价高者得
+  荷兰拍卖： nft owner设置初始价格，竞拍者给出满足该价格的offer或者价格更低的offer，nft owner可以主动降价，直到有双方都满意的价格出现
+  普通定价模式：nft owner设置初始价格，出价者可任意给offer，或者直接通过simpleBuyNFT()按当前最高标价购买
   */
   enum AuctionsType {England, Netherlands, Simple}
 
@@ -97,8 +101,6 @@ function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOwn
   }
 /*
   give offer, send eth to contract
-  英格兰拍卖：nft owner设置初始起拍价格，竞拍者逐步提高价格发起offer，价高者得
-  荷兰拍卖： nft owner设置初始价格，竞拍者给出满足该价格的offer或者价格更低的offer，nft owner可以主动降价，直到有双方都满意的价格出现
 */
   function makeOffer(uint _id, uint _price) public payable{
     //0.check amount

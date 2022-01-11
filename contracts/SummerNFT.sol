@@ -33,6 +33,17 @@ contract SummerNFT is ERC721, ERC721Enumerable {
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);
   }
+  function setBaseURI(string memory baseURI_) public {
+      baseURI = baseURI_;
+    }
+
+  function _baseURI() internal view virtual override returns (string memory) {
+      return baseURI;
+  }
+
+  function _burn(uint256 tokenId) internal virtual override(ERC721, ERC721URIStorage) {
+      super._burn(tokenId);
+  }
 
   function safeMint(string memory _tokenURI) public {
     require(!_tokenURIExists[_tokenURI], 'The token URI should be unique');
@@ -43,4 +54,6 @@ contract SummerNFT is ERC721, ERC721Enumerable {
     _safeMint(msg.sender, newItemId);
     _tokenURIExists[_tokenURI] = true;
   }
+
+
 }

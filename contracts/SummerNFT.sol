@@ -37,9 +37,7 @@ contract SummerNFT is ERC721, ERC721Enumerable {
   function safeMint(string memory _tokenURI) public {
     require(!_tokenURIExists[_tokenURI], 'The token URI should be unique');
     tokenURIs.push(_tokenURI);    
-    //_tokenIds自增，保证每个NFT的id唯一
     _tokenIds.increment();
-    //指定nft的id
     uint256 newItemId = _tokenIds.current();
     _tokenIdToTokenURI[newItemId] = _tokenURI;
     _safeMint(msg.sender, newItemId);

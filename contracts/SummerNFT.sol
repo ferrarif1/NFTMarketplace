@@ -3,9 +3,10 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
 contract SummerNFT is ERC721, ERC721Enumerable {
-
+  using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
   string[] public tokenURIs;
   mapping(string => bool) _tokenURIExists;
@@ -32,17 +33,6 @@ contract SummerNFT is ERC721, ERC721Enumerable {
 
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);
-  }
-  function setBaseURI(string memory baseURI_) public {
-      baseURI = baseURI_;
-    }
-
-  function _baseURI() internal view virtual override returns (string memory) {
-      return baseURI;
-  }
-
-  function _burn(uint256 tokenId) internal virtual override(ERC721, ERC721URIStorage) {
-      super._burn(tokenId);
   }
 
   function safeMint(string memory _tokenURI) public {

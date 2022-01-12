@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.11+commit.d7f03943"
+		"version": "0.8.7+commit.e28d00a7"
 	},
 	"language": "Solidity",
 	"output": {
@@ -64,15 +64,9 @@
 					},
 					{
 						"indexed": false,
-						"internalType": "bool",
-						"name": "fulfilled",
-						"type": "bool"
-					},
-					{
-						"indexed": false,
-						"internalType": "bool",
-						"name": "cancelled",
-						"type": "bool"
+						"internalType": "enum SummerNFTMarketplace.OfferStatus",
+						"name": "offerstatus",
+						"type": "uint8"
 					}
 				],
 				"name": "Offer",
@@ -154,6 +148,25 @@
 			{
 				"inputs": [
 					{
+						"internalType": "address",
+						"name": "_owner",
+						"type": "address"
+					}
+				],
+				"name": "NFTbalanceOf",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
 						"internalType": "uint256",
 						"name": "_id",
 						"type": "uint256"
@@ -161,6 +174,11 @@
 					{
 						"internalType": "uint256",
 						"name": "_price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_typeNum",
 						"type": "uint256"
 					}
 				],
@@ -173,16 +191,30 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_offerId",
+						"name": "_tokenId",
 						"type": "uint256"
-					},
+					}
+				],
+				"name": "bestPriceOfNFTId",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
 					{
 						"internalType": "uint256",
 						"name": "_tokenId",
 						"type": "uint256"
 					}
 				],
-				"name": "cancelOffer",
+				"name": "cancelAllOfferAndWithdrawFromSellList",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -200,7 +232,25 @@
 						"type": "uint256"
 					}
 				],
-				"name": "cancelOfferAndWithdrawFromSellList",
+				"name": "cancelOwnOffer",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_price",
+						"type": "uint256"
+					}
+				],
+				"name": "changePriceForSimpleAuctionsType",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -216,6 +266,24 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
+						"name": "_id",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_price",
+						"type": "uint256"
+					}
+				],
+				"name": "decreasePriceForNetherlandsAuctionsType",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
 						"name": "_offerId",
 						"type": "uint256"
 					},
@@ -225,9 +293,9 @@
 						"type": "uint256"
 					}
 				],
-				"name": "fillOffer",
+				"name": "fillOfferByNFTOwner",
 				"outputs": [],
-				"stateMutability": "payable",
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -267,6 +335,98 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_Offerid",
+						"type": "uint256"
+					}
+				],
+				"name": "offerDataOfOfferId",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "offerId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "id",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "user",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							},
+							{
+								"internalType": "enum SummerNFTMarketplace.OfferStatus",
+								"name": "offerstatus",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct SummerNFTMarketplace._Offer",
+						"name": "",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "offersOfNFTId",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "offerId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "id",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "user",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							},
+							{
+								"internalType": "enum SummerNFTMarketplace.OfferStatus",
+								"name": "offerstatus",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct SummerNFTMarketplace._Offer[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "owner",
 				"outputs": [
@@ -280,6 +440,43 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_NFTid",
+						"type": "uint256"
+					}
+				],
+				"name": "ownerOfNFTId",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_offerId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "rejectBestOfferAndCancelOtherOffers",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "renounceOwnership",
 				"outputs": [],
@@ -290,24 +487,29 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_typeNum",
+						"name": "_tokenId",
 						"type": "uint256"
 					}
 				],
-				"name": "setAuctionsType",
+				"name": "simpleBuyNFT",
 				"outputs": [],
-				"stateMutability": "nonpayable",
+				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
 				"inputs": [
 					{
+						"internalType": "address",
+						"name": "_owner",
+						"type": "address"
+					},
+					{
 						"internalType": "uint256",
-						"name": "",
+						"name": "_index",
 						"type": "uint256"
 					}
 				],
-				"name": "tokenIdToBestPrice",
+				"name": "tokenOfOwnerByIndex",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -322,46 +524,16 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
+						"name": "_tokenId",
 						"type": "uint256"
 					}
 				],
-				"name": "tokenIdToOffers",
+				"name": "tokenURIOfNFTId",
 				"outputs": [
 					{
-						"internalType": "uint256",
-						"name": "offerId",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "id",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "user",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "price",
-						"type": "uint256"
-					},
-					{
-						"internalType": "bool",
-						"name": "fulfilled",
-						"type": "bool"
-					},
-					{
-						"internalType": "bool",
-						"name": "cancelled",
-						"type": "bool"
+						"internalType": "string",
+						"name": "",
+						"type": "string"
 					}
 				],
 				"stateMutability": "view",
@@ -378,25 +550,6 @@
 				"name": "transferOwnership",
 				"outputs": [],
 				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
-				"name": "userFunds",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -490,6 +643,14 @@
 				"dweb:/ipfs/QmVmqRdBfbgYThpZSoAJ5o9mnAMjx8mCHHjv3Rh8cQAAg3"
 			]
 		},
+		"@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol": {
+			"keccak256": "0x1cbe42915bc66227970fe99bc0f783eb1de30f2b48f984af01ad45edb9658698",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2baa08eb67d9da46e6c4c049f17b7684a1c68c5268d0f466cfa0eb23ce2bf9b0",
+				"dweb:/ipfs/Qmdnj8zj4PfErB2HM2eKmDt7FrqrhggsZ6Qd8MpD593tgj"
+			]
+		},
 		"@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol": {
 			"keccak256": "0x483f88fbbb1d6d75000fbe8ce14279b5e6121cd5a29ff5f1b91fed407735a6c3",
 			"license": "MIT",
@@ -522,6 +683,14 @@
 				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
 			]
 		},
+		"@openzeppelin/contracts/utils/Counters.sol": {
+			"keccak256": "0xf0018c2440fbe238dd3a8732fa8e17a0f9dce84d31451dc8a32f6d62b349c9f1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://59e1c62884d55b70f3ae5432b44bb3166ad71ae3acd19c57ab6ddc3c87c325ee",
+				"dweb:/ipfs/QmezuXg5GK5oeA4F91EZhozBFekhq5TD966bHPH18cCqhu"
+			]
+		},
 		"@openzeppelin/contracts/utils/Strings.sol": {
 			"keccak256": "0x32c202bd28995dd20c4347b7c6467a6d3241c74c8ad3edcbb610cd9205916c45",
 			"license": "MIT",
@@ -547,19 +716,19 @@
 			]
 		},
 		"contracts/SummerNFT.sol": {
-			"keccak256": "0x2ed8710a5a5ecbbc8c1aac2e092aa6dfe1a0cbf3bd01b31c50337d8a4e18b0d5",
+			"keccak256": "0x69ae3b85758392f42bed3ca457911caf3b7518b6a6bc8a9eed2bf115e7d916b7",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://6e754ca6ade6a2d743c2287692043f0e8716762344045cb69ef9de85e664650e",
-				"dweb:/ipfs/QmTGXzEpeQUeMRMGVJDKFQ3SGgNu5dgha56Mr7NgF5Bafq"
+				"bzz-raw://09e873ab57cfc0382f37401d84025fe88ead2aa3acba437428653e9aee5b4152",
+				"dweb:/ipfs/QmfW8CL9SKGobz4eGsio83e1A2X55SveLHqzDyBRMWV9Ub"
 			]
 		},
 		"contracts/SummerNFTMarketplace.sol": {
-			"keccak256": "0xfb4102cf0f54b62b304f1510e8ad0904644f0173c64ee8b1699f3d6fcea79704",
+			"keccak256": "0x954d6924b0379167da5aec6370f7d1dd2500edc878e77287ac6033f65342dba1",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://450783001af11a050c444ae0ef4119a45c94890a745cdcb1d2b0e92b4e6fc7c8",
-				"dweb:/ipfs/Qmbp1ArVa8d9HwiEHUGdv1GvgjHoSGXAdsVyvL3tjUFBJZ"
+				"bzz-raw://b707808436db86b9ad6d2fc83cdc25b9e7354fce138fba25b411b83a0cc5e348",
+				"dweb:/ipfs/QmfYVyFErmPGMQKG6aJe4Q38EHoXWtPkvEFtz3ybxzc15g"
 			]
 		}
 	},

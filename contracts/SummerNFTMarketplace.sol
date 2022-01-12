@@ -5,6 +5,7 @@ import "./SummerNFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 contract SummerNFTMarketplace is Ownable {
+  using Counters for Counters.Counter;
   Counters.Counter private _offerIds;
   /*
   England -> increase price    (* Default *) 
@@ -23,7 +24,7 @@ contract SummerNFTMarketplace is Ownable {
   mapping (uint => _Offer[]) private tokenIdToOffers;
   mapping (uint => uint) private tokenIdToBestPrice;
   mapping (address => uint) private userFunds;
-  mapping (address => AuctionsType) private tokenIdToAuctionsType;
+  mapping (uint => AuctionsType) private tokenIdToAuctionsType;
   mapping (uint => uint) private OfferIdToTokenId;
   
   SummerNFT summerNFT;
@@ -31,7 +32,7 @@ contract SummerNFTMarketplace is Ownable {
   struct _Offer {
     uint offerId;  //offer id
     uint id;       //NFT id
-    address user;  //offer given by who
+    address user;  //offer given by whom
     uint price;    
     OfferStatus offerstatus;
   }
@@ -67,7 +68,7 @@ contract SummerNFTMarketplace is Ownable {
   function addNFTToSellList(uint _id, uint _price, uint _typeNum) public onlyOwnerOf(_id){
      summerNFT.transferFrom(msg.sender, address(this), _id); 
      if(_typeNum == 0){
-        tokenIdToAuctionsType[_id] = AuctionsType.England;
+       tokenIdToAuctionsType[_id] = AuctionsType.England;
      }else if(_typeNum == 1){
        tokenIdToAuctionsType[_id] = AuctionsType.Netherlands;
      }else{
@@ -95,7 +96,6 @@ contract SummerNFTMarketplace is Ownable {
 function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOwnerOf(_id){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
      require(_auctionsType == AuctionsType.Simple);
-     uint  _currentBestPrice = tokenIdToBestPrice[_id];
      tokenIdToBestPrice[_id] = _price;
   }
 /*
@@ -169,7 +169,7 @@ NFT拥有者接受offer
     //找到_offerId对应的offer
     _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
     require(offersOfId.length > 0, 'No Offer exist');
-    _Offer storage currentOffer = _Offer(0, 0, address(0), 0, OfferStatus.available);
+    _Offer memory currentOffer = _Offer(0, 0, address(0), 0, OfferStatus.available);
     for(uint index = 0; index < offersOfId.length; index++){
       _Offer memory offerIndex = offersOfId[index];
       if(offerIndex.offerId == _offerId){
@@ -185,10 +185,10 @@ NFT拥有者接受offer
     currentOffer.offerstatus = OfferStatus.fulfilled;
     //NFT原拥有者的合约存款余额增加
     address ownerOfNFT =  summerNFT.ownerOf(_tokenId);
-    userFunds[ownerOfNFT] += msg.value;
+    userFunds[ownerOfNFT] += currentOffer.price;
     //cancel other offers , refund or update userFunds 取消其他offer，相应发起人的合约存款余额增加
     for(uint index = 0; index < offersOfId.length; index++){
-      _Offer storage offerIndex = offersOfId[index];
+      _Offer memory offerIndex = offersOfId[index];
       if(offerIndex.offerId != _offerId){
         offerIndex.offerstatus = OfferStatus.cancelled;
         userFunds[offerIndex.user] = offerIndex.price;
@@ -219,7 +219,7 @@ only cancel, still on sale(NFT hold by contract)
     require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
      //cancel every offers , refund or update userFunds 取消全部offer，相应发起人的合约存款余额增加
     for(uint index = 0; index < offersOfId.length; index++){
-      _Offer storage offerIndex = offersOfId[index];
+      _Offer memory offerIndex = offersOfId[index];
       offerIndex.offerstatus = OfferStatus.cancelled;
       userFunds[offerIndex.user] = offerIndex.price;
       emit OfferCancelled(offerIndex.offerId, offerIndex.id, offerIndex.user);
@@ -232,9 +232,9 @@ cancel one's own Offer
   function cancelOwnOffer(uint _offerId, uint _tokenId)public{
      _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
      require(offersOfId.length > 0, 'No Offer exist');
-    _Offer storage currentOffer = _Offer(0, 0, address(0), 0, OfferStatus.available);
+    _Offer memory currentOffer = _Offer(0, 0, address(0), 0, OfferStatus.available);
     for(uint index = 0; index < offersOfId.length; index++){
-      _Offer storage offerIndex = offersOfId[index];
+      _Offer memory offerIndex = offersOfId[index];
       if(offerIndex.offerId == _offerId){
         currentOffer = offerIndex;
         break;
@@ -244,7 +244,7 @@ cancel one's own Offer
     require(currentOffer.offerId == _offerId, 'The offer must exist');
     require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
     currentOffer.offerstatus = OfferStatus.cancelled;
-    userFunds[offerIndex.user] = offerIndex.price;
+    userFunds[currentOffer.user] = currentOffer.price;
     emit OfferCancelled(_offerId, currentOffer.id, msg.sender);
   }
 
@@ -254,10 +254,10 @@ AuctionsType.Simple模式下直接按标价购买NFT
 */
 function simpleBuyNFT(uint _tokenId) public payable{
     //0.only for AuctionsType.Simple
-    AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
+    AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
     require(_auctionsType == AuctionsType.Simple);
     //1.if new price match the best price
-    uint  _currentBestPrice = tokenIdToBestPrice[_id];
+    uint  _currentBestPrice = tokenIdToBestPrice[_tokenId];
     require(msg.value == _currentBestPrice);
     //2.transfer nft
     summerNFT.transferFrom(address(this), msg.sender, _tokenId);
@@ -267,10 +267,10 @@ function simpleBuyNFT(uint _tokenId) public payable{
     //4.cancel all other offers , refund or update userFunds 取消其他offer
     _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
     for(uint index = 0; index < offersOfId.length; index++){
-      _Offer storage offerIndex = offersOfId[index];
+      _Offer memory offerIndex = offersOfId[index];
       offerIndex.offerstatus = OfferStatus.cancelled;
       userFunds[offerIndex.user] = offerIndex.price;
-      emit OfferCancelled(offerIndex.offerId, _tokenId, offerIndex.id);
+      emit OfferCancelled(offerIndex.offerId, _tokenId, offerIndex.user);
     }
   }
 /*
@@ -284,10 +284,10 @@ reject the best price means cancel all the offer
     summerNFT.transferFrom(address(this), msg.sender, _tokenId);
      //cancel every offers , refund or update userFunds 取消所有offer
     for(uint index = 0; index < offersOfId.length; index++){
-      _Offer storage offerIndex = offersOfId[index];
+      _Offer memory offerIndex = offersOfId[index];
       offerIndex.offerstatus = OfferStatus.cancelled;
       userFunds[offerIndex.user] = offerIndex.price;
-      emit OfferCancelled(offerIndex.offerId, _tokenId, offerIndex.id);
+      emit OfferCancelled(offerIndex.offerId, _tokenId, offerIndex.user);
     }
   }
 /*
@@ -304,16 +304,16 @@ claim Funds
 /*
 request owner of nftid
 */
- function ownerOfNFTId(uint _NFTid)public view returns(address memory){
+ function ownerOfNFTId(uint _NFTid)public view returns(address){
     address ownerOfNFT =  summerNFT.ownerOf(_NFTid);
     return ownerOfNFT;
   }
 /*
-request balance of owner
+request NFT balance of owner
 */
- function balanceOf(address _owner) public view returns (uint256) {
+ function NFTbalanceOf(address _owner) public view returns (uint256) {
     uint256 balance =  summerNFT.balanceOf(_owner);
-    return ownerOfNFT;
+    return balance;
  }
 /*
 request nftid of owner at index i
@@ -325,8 +325,8 @@ function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns
 /*
   request tokenURI of nftid
 */
- function tokenURIOfNFTId(uint _NFTid)public view returns(string memory){
-    address tokenURI =  summerNFT.tokenURI(tokenId);
+ function tokenURIOfNFTId(uint _tokenId)public view returns(string memory){
+    string memory tokenURI =  summerNFT.tokenURI(_tokenId);
     return tokenURI;
  }
 
@@ -334,15 +334,15 @@ function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns
 /*
 request best price of nftid
 */
-  function bestPriceOfNFTId(uint _NFTid)public view returns(uint256 memory){
-    uint  _currentBestPrice = tokenIdToBestPrice[_id];
+  function bestPriceOfNFTId(uint _tokenId)public view returns(uint256){
+    uint  _currentBestPrice = tokenIdToBestPrice[_tokenId];
     return _currentBestPrice;
   }
 
 /*
 request all offers for nftid
 */
-  function offersOfNFTId(uint _NFTid)public view returns(_Offer[] memory){
+  function offersOfNFTId(uint _tokenId)public view returns(_Offer[] memory){
     _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
     return offersOfId;
   }
@@ -352,14 +352,14 @@ request all offers for nftid
   function offerDataOfOfferId(uint _Offerid)public view returns(_Offer memory){
     uint _tokenId = OfferIdToTokenId[_Offerid];
     _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
-    require(offersOfId > 0,"No offers");
+    require(offersOfId.length > 0,"No offers");
     for(uint index = 0; index < offersOfId.length; index++){
       _Offer memory offerIndex = offersOfId[index];
       if(offerIndex.offerId == _Offerid){
         return offerIndex;
       }
     }
-    return _Offer(-1, -1, address(0), 0, false, false);
+    return _Offer(0, 0, address(0), 0, OfferStatus.available);
   }
 
   // Fallback: reverts if Ether is sent to this smart-contract by mistake

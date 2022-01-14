@@ -315,6 +315,13 @@ request NFT balance of owner
     uint256 balance =  summerNFT.balanceOf(_owner);
     return balance;
  }
+ /*
+request ETH balance of owner
+*/
+ function ETHbalanceOf(address _owner) public view returns (uint256) {
+    uint256 balance =  userFunds[_owner];
+    return balance;
+ }
 /*
 request nftid of owner at index i
 */

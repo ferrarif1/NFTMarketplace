@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./SummerNFT.sol";
+import "./OneRingNFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-contract SummerNFTMarketplace is Ownable {
+contract OneRingNFTMarketplace is Ownable {
   using Counters for Counters.Counter;
   Counters.Counter private _offerIds;
   /*
@@ -27,7 +27,7 @@ contract SummerNFTMarketplace is Ownable {
   mapping (uint => AuctionsType) private tokenIdToAuctionsType;
   mapping (uint => uint) private OfferIdToTokenId;
   
-  SummerNFT summerNFT;
+  OneRingNFT OneRingNFT;
   
   struct _Offer {
     uint offerId;  //offer id
@@ -50,12 +50,12 @@ contract SummerNFTMarketplace is Ownable {
   event OfferCancelled(uint offerId, uint id, address owner);
   event ClaimFunds(address user, uint amount);
 
-  constructor(address _summerNFT) {
-    summerNFT = SummerNFT(_summerNFT);
+  constructor(address _OneRingNFT) {
+    OneRingNFT = OneRingNFT(_OneRingNFT);
   }
 
   modifier onlyOwnerOf(uint _NFTid){
-      address ownerOfNFT =  summerNFT.ownerOf(_NFTid);
+      address ownerOfNFT =  OneRingNFT.ownerOf(_NFTid);
       require(msg.sender == ownerOfNFT);
       _;
   }
@@ -66,7 +66,7 @@ contract SummerNFTMarketplace is Ownable {
   withdraw NFT from sell list
 */
   function addNFTToSellList(uint _id, uint _price, uint _typeNum) public onlyOwnerOf(_id){
-     summerNFT.transferFrom(msg.sender, address(this), _id); 
+     OneRingNFT.transferFrom(msg.sender, address(this), _id); 
      if(_typeNum == 0){
        tokenIdToAuctionsType[_id] = AuctionsType.England;
      }else if(_typeNum == 1){
@@ -78,7 +78,7 @@ contract SummerNFTMarketplace is Ownable {
   }
 
   function withdrawNFTFromSellList(uint _id) public onlyOwnerOf(_id){
-    summerNFT.transferFrom(address(this), msg.sender, _id);
+    OneRingNFT.transferFrom(address(this), msg.sender, _id);
   }
 /*
   decrease price for AuctionsType.Netherlands
@@ -180,11 +180,11 @@ NFT拥有者接受offer
     require(currentOffer.offerId == _offerId, 'The offer must exist');
     require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
     //NFT转账给offer的发起人
-    summerNFT.transferFrom(address(this), currentOffer.user, currentOffer.id);
+    OneRingNFT.transferFrom(address(this), currentOffer.user, currentOffer.id);
     //offer状态改为满足
     currentOffer.offerstatus = OfferStatus.fulfilled;
     //NFT原拥有者的合约存款余额增加
-    address ownerOfNFT =  summerNFT.ownerOf(_tokenId);
+    address ownerOfNFT =  OneRingNFT.ownerOf(_tokenId);
     userFunds[ownerOfNFT] += currentOffer.price;
     //cancel other offers , refund or update userFunds 取消其他offer，相应发起人的合约存款余额增加
     for(uint index = 0; index < offersOfId.length; index++){
@@ -260,9 +260,9 @@ function simpleBuyNFT(uint _tokenId) public payable{
     uint  _currentBestPrice = tokenIdToBestPrice[_tokenId];
     require(msg.value == _currentBestPrice);
     //2.transfer nft
-    summerNFT.transferFrom(address(this), msg.sender, _tokenId);
+    OneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
     //3.update userFunds for nft owner
-    address ownerOfNFT =  summerNFT.ownerOf(_tokenId);
+    address ownerOfNFT =  OneRingNFT.ownerOf(_tokenId);
     userFunds[ownerOfNFT] += msg.value;
     //4.cancel all other offers , refund or update userFunds 取消其他offer
     _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
@@ -281,7 +281,7 @@ reject the best price means cancel all the offer
   function cancelAllOfferAndWithdrawFromSellList(uint _tokenId) public  onlyOwnerOf(_tokenId){
     _Offer[] memory offersOfId = tokenIdToOffers[_tokenId];
     //NFT从合约取回
-    summerNFT.transferFrom(address(this), msg.sender, _tokenId);
+    OneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
      //cancel every offers , refund or update userFunds 取消所有offer
     for(uint index = 0; index < offersOfId.length; index++){
       _Offer memory offerIndex = offersOfId[index];
@@ -305,14 +305,14 @@ claim Funds
 request owner of nftid
 */
  function ownerOfNFTId(uint _NFTid)public view returns(address){
-    address ownerOfNFT =  summerNFT.ownerOf(_NFTid);
+    address ownerOfNFT =  OneRingNFT.ownerOf(_NFTid);
     return ownerOfNFT;
   }
 /*
 request NFT balance of owner
 */
  function NFTbalanceOf(address _owner) public view returns (uint256) {
-    uint256 balance =  summerNFT.balanceOf(_owner);
+    uint256 balance =  OneRingNFT.balanceOf(_owner);
     return balance;
  }
  /*
@@ -326,14 +326,14 @@ request ETH balance of owner
 request nftid of owner at index i
 */
 function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns (uint256) {
-    uint256 tokenid =  summerNFT.tokenOfOwnerByIndex(_owner, _index);
+    uint256 tokenid =  OneRingNFT.tokenOfOwnerByIndex(_owner, _index);
     return tokenid;
 }
 /*
   request tokenURI of nftid
 */
  function tokenURIOfNFTId(uint _tokenId)public view returns(string memory){
-    string memory tokenURI =  summerNFT.tokenURI(_tokenId);
+    string memory tokenURI =  OneRingNFT.tokenURI(_tokenId);
     return tokenURI;
  }
 

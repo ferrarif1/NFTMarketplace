@@ -5,14 +5,14 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 
-contract SummerNFT is ERC721, ERC721Enumerable {
+contract OneRingNFT is ERC721, ERC721Enumerable {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
   string[] public tokenURIs;
   mapping(string => bool) _tokenURIExists;
   mapping(uint => string) _tokenIdToTokenURI;
 
-  constructor() ERC721("Summer Collection", "SUC") {}
+  constructor() ERC721("One Ri n g Collection", "SUC") {}
 
   function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
     super._beforeTokenTransfer(from, to, tokenId);

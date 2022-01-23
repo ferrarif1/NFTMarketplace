@@ -16,7 +16,6 @@ contract OneRingNFTMarketplace is Ownable {
   荷兰拍卖： nft owner设置初始价格，竞拍者给出满足该价格的offer或者价格更低的offer，nft owner可以主动降价，直到有双方都满意的价格出现 只能通过offer与接受offer达成，完成交易主动权在owner
   普通定价模式：nft owner设置初始价格，出价者可任意给offer，或者直接通过simpleBuyNFT()按当前最高标价购买 可以通过offer或直接购买达成，完成交易主动权在双方
 
-  todo:目前拍卖竞价需要实际发起交易，竞拍失败将会损失gas费
   */
   enum AuctionsType {England, Netherlands, Simple}
   enum OfferStatus {available, fulfilled, cancelled}

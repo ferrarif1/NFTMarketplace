@@ -12,7 +12,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   mapping(string => bool) _tokenURIExists;
   mapping(uint => string) _tokenIdToTokenURI;
 
-  constructor() ERC721("One Ri n g Collection", "SUC") {}
+  constructor() ERC721("One Ring Collection", "ORC") {}
 
   function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
     super._beforeTokenTransfer(from, to, tokenId);

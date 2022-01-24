@@ -476,16 +476,11 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_offerId",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
 						"name": "_tokenId",
 						"type": "uint256"
 					}
 				],
-				"name": "rejectBestOfferAndCancelOtherOffers",
+				"name": "rejectAllOffers",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -738,11 +733,11 @@
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0xe18ca2bedb7176486015eed3d5d328a42fbf94ace91acf6036bbfcbad40b01f5",
+			"keccak256": "0x518b2134a4b64f9166cea519da03d1c6b04bf3ae6efb86548340bc29f5b3e325",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ef1c5c2519fc320fbd2b6d0832a6d5e1de8d88e900f741eeeee5dcd45f392582",
-				"dweb:/ipfs/QmandgLZZoEdCLumRiXbovMURBQHyQcvZnDEvw7riSiDwG"
+				"bzz-raw://bac233d6c9037b38f7306bc6131059265fdee422b4712090552dd72a5f4cea34",
+				"dweb:/ipfs/QmTn6CDeDzgqPD3t8EDMYtV3aGg8tNqWLx6H6PiZeUaxLj"
 			]
 		}
 	},

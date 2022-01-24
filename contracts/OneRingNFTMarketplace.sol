@@ -220,6 +220,7 @@ NFT拥有者接受offer
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer memory offerIndex = allOffers[offerIdOfIndex];
       if(offerIndex.offerId != _offerId){
+        require(offerIndex.offerstatus == OfferStatus.available, 'Offer status should be available');
         offerIndex.offerstatus = OfferStatus.cancelled;
         userFunds[offerIndex.user] += offerIndex.price;
         emit OfferCancelled(offerIndex.offerId, offerIndex.id, offerIndex.user);
@@ -229,25 +230,20 @@ NFT拥有者接受offer
   }
 
 /*
-reject the best offer and cancel other offers
+reject all offers
 only cancel, still on sale(NFT hold by contract)
-拒绝最好的Offer （= 取消所有offer）
+取消所有offer
 */
-  function rejectBestOfferAndCancelOtherOffers(uint _offerId, uint _tokenId) public  onlyOwnerOf(_tokenId){
-     //找到_offerId对应的offer
-    _Offer storage currentOffer = allOffers[_offerId];
-    require(currentOffer.offerId == _offerId, 'The offer must exist');
-    require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
+  function rejectAllOffers(uint _tokenId) public  onlyOwnerOf(_tokenId){
     //cancel every offers , refund or update userFunds 取消全部offer，相应发起人的合约存款余额增加
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer memory offerIndex = allOffers[offerIdOfIndex];
-      if(offerIndex.offerId != _offerId){
-        offerIndex.offerstatus = OfferStatus.cancelled;
-        userFunds[offerIndex.user] += offerIndex.price;
-        emit OfferCancelled(offerIndex.offerId, offerIndex.id, offerIndex.user);
-      }
+      require(offerIndex.offerstatus == OfferStatus.available, 'Offer status should be available');
+      offerIndex.offerstatus = OfferStatus.cancelled;
+      userFunds[offerIndex.user] += offerIndex.price;
+      emit OfferCancelled(offerIndex.offerId, offerIndex.id, offerIndex.user);
     }
   }
 /*
@@ -280,11 +276,12 @@ function simpleBuyNFT(uint _tokenId) public payable{
     userFunds[ownerOfNFT] += msg.value;
     //3.transfer nft
     oneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
-    //4.cancel all other offers , refund or update userFunds 取消其他offer
+    //4.cancel all other offers , refund or update userFunds 取消所有offer
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer memory offerIndex = allOffers[offerIdOfIndex];
+      require(offerIndex.offerstatus == OfferStatus.available, 'Offer status should be available');
       offerIndex.offerstatus = OfferStatus.cancelled;
       userFunds[offerIndex.user] += offerIndex.price;
       emit OfferCancelled(offerIndex.offerId, offerIndex.id, offerIndex.user);
@@ -298,11 +295,12 @@ reject the best price means cancel all the offer
   function cancelAllOfferAndWithdrawFromSellList(uint _tokenId) public onlyOwnerOf(_tokenId){
     //NFT从合约取回
     oneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
-     //cancel every offers , refund or update userFunds 取消所有offer
+    //cancel every offers , refund or update userFunds 取消所有offer
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer memory offerIndex = allOffers[offerIdOfIndex];
+      require(offerIndex.offerstatus == OfferStatus.available, 'Offer status should be available');
       offerIndex.offerstatus = OfferStatus.cancelled;
       userFunds[offerIndex.user] += offerIndex.price;
       emit OfferCancelled(offerIndex.offerId, offerIndex.id, offerIndex.user);

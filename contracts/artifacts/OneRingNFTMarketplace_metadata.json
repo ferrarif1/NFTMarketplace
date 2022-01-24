@@ -214,12 +214,39 @@
 						"type": "uint256"
 					}
 				],
-				"name": "bestPriceOfNFTId",
+				"name": "bestOfferOfNFTId",
 				"outputs": [
 					{
-						"internalType": "uint256",
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "offerId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "id",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "user",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							},
+							{
+								"internalType": "enum OneRingNFTMarketplace.OfferStatus",
+								"name": "offerstatus",
+								"type": "uint8"
+							}
+						],
+						"internalType": "struct OneRingNFTMarketplace._Offer",
 						"name": "",
-						"type": "uint256"
+						"type": "tuple"
 					}
 				],
 				"stateMutability": "view",
@@ -243,11 +270,6 @@
 					{
 						"internalType": "uint256",
 						"name": "_offerId",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "_tokenId",
 						"type": "uint256"
 					}
 				],
@@ -348,9 +370,9 @@
 						"type": "uint256"
 					}
 				],
-				"name": "makeOfferWithUserFunds",
+				"name": "makeOfferWithUserFundsAndEther",
 				"outputs": [],
-				"stateMutability": "nonpayable",
+				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
@@ -407,39 +429,12 @@
 						"type": "uint256"
 					}
 				],
-				"name": "offersOfNFTId",
+				"name": "offerIdsOfNFTId",
 				"outputs": [
 					{
-						"components": [
-							{
-								"internalType": "uint256",
-								"name": "offerId",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "id",
-								"type": "uint256"
-							},
-							{
-								"internalType": "address",
-								"name": "user",
-								"type": "address"
-							},
-							{
-								"internalType": "uint256",
-								"name": "price",
-								"type": "uint256"
-							},
-							{
-								"internalType": "enum OneRingNFTMarketplace.OfferStatus",
-								"name": "offerstatus",
-								"type": "uint8"
-							}
-						],
-						"internalType": "struct OneRingNFTMarketplace._Offer[]",
+						"internalType": "uint256[]",
 						"name": "",
-						"type": "tuple[]"
+						"type": "uint256[]"
 					}
 				],
 				"stateMutability": "view",
@@ -743,11 +738,11 @@
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0xf4781f1b3c7c9b8620c93d0ae8eb856b69e7d29b028c5117eca6c96ecc4a0ee7",
+			"keccak256": "0xe18ca2bedb7176486015eed3d5d328a42fbf94ace91acf6036bbfcbad40b01f5",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0033f1db0e170765a808ec41c4d99cbd04d5436561e05f18bb4ef8a915fe2e29",
-				"dweb:/ipfs/QmW8r421Sspi4wYXmafJcfyvxdhDMj6VcTFEZj8ALqa1wn"
+				"bzz-raw://ef1c5c2519fc320fbd2b6d0832a6d5e1de8d88e900f741eeeee5dcd45f392582",
+				"dweb:/ipfs/QmandgLZZoEdCLumRiXbovMURBQHyQcvZnDEvw7riSiDwG"
 			]
 		}
 	},

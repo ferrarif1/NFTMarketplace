@@ -87,7 +87,7 @@ contract OneRingNFTMarketplace is Ownable {
 */
   function decreasePriceForNetherlandsAuctionsType(uint _id,  uint _price) public onlyOwnerOf(_id){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
-     require(_auctionsType == AuctionsType.Netherlands);
+     require(_auctionsType == AuctionsType.Netherlands,"AuctionsType should be Netherlands");
      uint  _currentStartPrice = tokenIdToStartPrice[_id];
      require(_price <= _currentStartPrice, 'The new price should be lesser than current best price given by owner of nft');
      tokenIdToStartPrice[_id] = _price;
@@ -108,7 +108,7 @@ function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOwn
 */
   function makeOffer(uint _id, uint _price) public payable{
     //0.check amount
-    require(msg.value == _price, 'The ETH amount should match with the offer Price');
+    require(msg.value >= _price, 'The ETH amount should match with the offer Price');
     //1.if new price should be the best price
     //如果没有offer，当前最佳价格为0
     uint  _currentBestPrice = 0;
@@ -270,7 +270,7 @@ function simpleBuyNFT(uint _tokenId) public payable{
     require(_auctionsType == AuctionsType.Simple);
     //1.if new price match the start price
     uint  startPrice = tokenIdToStartPrice[_tokenId];
-    require(msg.value == startPrice);
+    require(msg.value >= startPrice);
     //2.update userFunds for nft owner
     address ownerOfNFT =  oneRingNFT.ownerOf(_tokenId);
     userFunds[ownerOfNFT] += msg.value;
@@ -378,7 +378,7 @@ request all offers for nftid
   }
 
   // Fallback: reverts if Ether is sent to this smart-contract by mistake
-  fallback () external {
-    revert();
-  }
+  // fallback () external payable{
+  //   revert();
+  // }
 }

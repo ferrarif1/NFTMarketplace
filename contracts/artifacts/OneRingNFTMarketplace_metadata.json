@@ -142,10 +142,6 @@
 				"type": "event"
 			},
 			{
-				"stateMutability": "nonpayable",
-				"type": "fallback"
-			},
-			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -733,11 +729,11 @@
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0x7c5a5e4df8019e105508b4d6fda91904e692720d8094792604b92071e6e66788",
+			"keccak256": "0xb735911eb0dd8827f903892d21007e50b07168a8bd59f4e900021295a2d21cbb",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://d325c4be3d092dbac1b80f10cc95d3b98c11c8ef17c3370da1aa24bfe5aca408",
-				"dweb:/ipfs/Qmcg7cUzkZdwaHmVPBMmzo2VBDhz5Y6sJH72RccMLUG1aS"
+				"bzz-raw://188b6247b50ae0803b5d688fb5222ab6e6d310c197a47ecf3e0b90e0826c3d08",
+				"dweb:/ipfs/QmYuLHRzoRq5t71dDJQfzYSgW3a5WX2fYjzrKWpiLqnP49"
 			]
 		}
 	},

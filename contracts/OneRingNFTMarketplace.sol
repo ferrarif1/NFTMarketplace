@@ -391,7 +391,8 @@ request all offers for nftid
   fallback () external payable{
     //revert();
   }
-
+  
   receive() external payable{
+    userFunds[msg.sender] += msg.value;
   }
 }

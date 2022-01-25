@@ -144,12 +144,14 @@ function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOri
     _offerIds.increment();//_offerIds从1开始递增
     uint256 newOfferId = _offerIds.current();
     //更新全部Offer列表
-    allOffers[newOfferId] = _Offer(newOfferId, _id, msg.sender, _price, OfferStatus.available);
+    _Offer memory newOffer = _Offer(newOfferId, _id, msg.sender, _price, OfferStatus.available);
+    allOffers[newOfferId] = newOffer;
     //更新nft对应的全部offer的id
-    offerIdsOfId[offerIdsOfId.length] = newOfferId;
+    offerIdsOfId.push(newOfferId);
     tokenIdToOfferIds[_id] = offerIdsOfId;
     //更新最佳Offer id
     tokenIdToBestOfferId[_id] = newOfferId;
+    
     //4.emit event
     emit Offer(newOfferId, _id, msg.sender, _price, OfferStatus.available);
   }
@@ -193,9 +195,10 @@ function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOri
     _offerIds.increment();//_offerIds从1开始递增
     uint256 newOfferId = _offerIds.current();
     //更新全部Offer列表
-    allOffers[newOfferId] = _Offer(newOfferId, _id, msg.sender, _price, OfferStatus.available);
+    _Offer memory newOffer = _Offer(newOfferId, _id, msg.sender, _price, OfferStatus.available);
+    allOffers[newOfferId] = newOffer;
     //更新nft对应的全部offer的id
-    offerIdsOfId[offerIdsOfId.length] = newOfferId;
+    offerIdsOfId.push(newOfferId);
     tokenIdToOfferIds[_id] = offerIdsOfId;
     //更新最佳Offer id
     tokenIdToBestOfferId[_id] = newOfferId;
@@ -219,8 +222,8 @@ NFT拥有者接受offer
     //offer状态改为满足
     currentOffer.offerstatus = OfferStatus.fulfilled;
     //NFT原拥有者的合约存款余额增加
-    address ownerOfNFT =  oneRingNFT.ownerOf(_tokenId);
-    userFunds[ownerOfNFT] += currentOffer.price;
+    address originalOwnerOfNFT = tokenIdToOriginalAddress[_NFTid];
+    userFunds[originalOwnerOfNFT] += currentOffer.price;
     //cancel other offers , refund or update userFunds 取消其他offer，相应发起人的合约存款余额增加
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
@@ -279,8 +282,8 @@ function simpleBuyNFT(uint _tokenId) public payable{
     uint  startPrice = tokenIdToStartPrice[_tokenId];
     require(msg.value >= startPrice);
     //2.update userFunds for nft owner
-    address ownerOfNFT =  oneRingNFT.ownerOf(_tokenId);
-    userFunds[ownerOfNFT] += msg.value;
+    address originalOwnerOfNFT = tokenIdToOriginalAddress[_NFTid];
+    userFunds[originalOwnerOfNFT] += msg.value;
     //3.transfer nft
     oneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
     //4.cancel all other offers , refund or update userFunds 取消所有offer

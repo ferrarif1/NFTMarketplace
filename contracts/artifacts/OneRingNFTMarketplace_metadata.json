@@ -13,7 +13,7 @@
 						"type": "address"
 					}
 				],
-				"stateMutability": "nonpayable",
+				"stateMutability": "payable",
 				"type": "constructor"
 			},
 			{
@@ -140,6 +140,10 @@
 				],
 				"name": "OwnershipTransferred",
 				"type": "event"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "fallback"
 			},
 			{
 				"inputs": [
@@ -569,6 +573,10 @@
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
+			},
+			{
+				"stateMutability": "payable",
+				"type": "receive"
 			}
 		],
 		"devdoc": {
@@ -729,11 +737,11 @@
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0xb735911eb0dd8827f903892d21007e50b07168a8bd59f4e900021295a2d21cbb",
+			"keccak256": "0x6bf24c934df0386eb2748881ec18a5ad245b00ee9a47204990d50c8543e695fb",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://188b6247b50ae0803b5d688fb5222ab6e6d310c197a47ecf3e0b90e0826c3d08",
-				"dweb:/ipfs/QmYuLHRzoRq5t71dDJQfzYSgW3a5WX2fYjzrKWpiLqnP49"
+				"bzz-raw://add60130f095b18bd15a5d35fa14e0b21f8e0270725a0c481b68e8e50e980928",
+				"dweb:/ipfs/QmfGojHmZNnGcNo1soCx5qxzvbmDEwjA2GdDMGkthBoECW"
 			]
 		}
 	},

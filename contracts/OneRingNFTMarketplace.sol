@@ -25,7 +25,8 @@ contract OneRingNFTMarketplace is Ownable {
   mapping (uint => uint) private tokenIdToStartPrice;//nft owner设置的初始价格
   mapping (address => uint) private userFunds;//用户在合约的存款余额
   mapping (uint => AuctionsType) private tokenIdToAuctionsType;//nft的拍卖模式
-  
+  mapping (uint => address)private tokenIdToOriginalAddress;//记录addtoselllist后的nft的原所有者
+
   OneRingNFT oneRingNFT;
   
   struct _Offer {
@@ -48,7 +49,7 @@ contract OneRingNFTMarketplace is Ownable {
   event OfferCancelled(uint offerId, uint id, address owner);
   event ClaimFunds(address user, uint amount);
 
-  constructor(address _oneRingNFT) {
+  constructor(address _oneRingNFT) payable{
     oneRingNFT = OneRingNFT(_oneRingNFT);
   }
 
@@ -57,7 +58,12 @@ contract OneRingNFTMarketplace is Ownable {
       require(msg.sender == ownerOfNFT);
       _;
   }
-
+  //NFT在addNFTToSellList后所有者变更为合约，这里tokenIdToOriginalAddress记录NFT的原所有者
+  modifier onlyOriginalOwnerOf(uint _NFTid){
+      address originalOwnerOfNFT =  tokenIdToOriginalAddress[_NFTid];
+      require(msg.sender == originalOwnerOfNFT);
+      _;
+  }
  
 /*
   add to sell list and set start price, choose AuctionsType
@@ -66,6 +72,7 @@ contract OneRingNFTMarketplace is Ownable {
 */
   function addNFTToSellList(uint _id, uint _price, uint _typeNum) public onlyOwnerOf(_id){
      oneRingNFT.transferFrom(msg.sender, address(this), _id); 
+     tokenIdToOriginalAddress[_id] = msg.sender;
      if(_typeNum == 0){
        tokenIdToAuctionsType[_id] = AuctionsType.England;
      }else if(_typeNum == 1){
@@ -78,14 +85,14 @@ contract OneRingNFTMarketplace is Ownable {
 /*
   取消销售，从合约取回NFT
 */
-  function withdrawNFTFromSellList(uint _id) public onlyOwnerOf(_id){
+  function withdrawNFTFromSellList(uint _id) public onlyOriginalOwnerOf(_id){
     oneRingNFT.transferFrom(address(this), msg.sender, _id);
   }
 /*
   decrease price for AuctionsType.Netherlands
   荷兰拍卖模式下 NFT拥有者主动降低价格
 */
-  function decreasePriceForNetherlandsAuctionsType(uint _id,  uint _price) public onlyOwnerOf(_id){
+  function decreasePriceForNetherlandsAuctionsType(uint _id,  uint _price) public onlyOriginalOwnerOf(_id){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
      require(_auctionsType == AuctionsType.Netherlands,"AuctionsType should be Netherlands");
      uint  _currentStartPrice = tokenIdToStartPrice[_id];
@@ -96,7 +103,7 @@ contract OneRingNFTMarketplace is Ownable {
    change price for AuctionsType.Simple
    简单拍卖模式下，NFT拥有者修改价格
   */
-function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOwnerOf(_id){
+function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOriginalOwnerOf(_id){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_id];
      require(_auctionsType == AuctionsType.Simple);
      tokenIdToStartPrice[_id] = _price;
@@ -202,7 +209,7 @@ accept one offer and reject others
 NFT拥有者接受offer
 两种拍卖都是通过Offer完成
 */
-  function fillOfferByNFTOwner(uint _offerId, uint _tokenId) public onlyOwnerOf(_tokenId){
+  function fillOfferByNFTOwner(uint _offerId, uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
     //找到_offerId对应的offer
     _Offer storage currentOffer = allOffers[_offerId];
     require(currentOffer.offerId == _offerId, 'The offer must exist');
@@ -234,7 +241,7 @@ reject all offers
 only cancel, still on sale(NFT hold by contract)
 取消所有offer
 */
-  function rejectAllOffers(uint _tokenId) public  onlyOwnerOf(_tokenId){
+  function rejectAllOffers(uint _tokenId) public  onlyOriginalOwnerOf(_tokenId){
     //cancel every offers , refund or update userFunds 取消全部offer，相应发起人的合约存款余额增加
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
@@ -292,7 +299,7 @@ cancel Offer and withdraw NFT from contract
 reject the best price means cancel all the offer
 取消所有offer 并取回NFT到自己地址
 */
-  function cancelAllOfferAndWithdrawFromSellList(uint _tokenId) public onlyOwnerOf(_tokenId){
+  function cancelAllOfferAndWithdrawFromSellList(uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
     //NFT从合约取回
     oneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
     //cancel every offers , refund or update userFunds 取消所有offer
@@ -378,7 +385,10 @@ request all offers for nftid
   }
 
   // Fallback: reverts if Ether is sent to this smart-contract by mistake
-  // fallback () external payable{
-  //   revert();
-  // }
+  fallback () external payable{
+    //revert();
+  }
+
+  receive() external payable{
+  }
 }

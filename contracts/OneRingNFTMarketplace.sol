@@ -12,9 +12,9 @@ contract OneRingNFTMarketplace is Ownable {
   Netherlands -> decrease price
   Simple -> Fixed price
 
-  英格兰拍卖：nft owner设置初始起拍价格，竞拍者逐步提高价格发起offer，价高者得 只能通过offer与接受offer达成，完成交易主动权在owner
-  荷兰拍卖： nft owner设置初始价格，竞拍者给出满足该价格的offer或者价格更低的offer，nft owner可以主动降价，直到有双方都满意的价格出现 只能通过offer与接受offer达成，完成交易主动权在owner
-  普通定价模式：nft owner设置初始价格，出价者给offer需要满足比当前最佳offer金额更高，或者直接通过simpleBuyNFT()按startPrice标价购买 可以通过offer或直接购买达成，完成交易主动权在双方
+  英格兰拍卖 0：nft owner设置初始起拍价格，竞拍者逐步提高价格发起offer，价高者得 只能通过offer与接受offer达成，完成交易主动权在owner
+  荷兰拍卖 1： nft owner设置初始价格，竞拍者给出满足该价格的offer或者价格更低的offer，nft owner可以主动降价，直到有双方都满意的价格出现 只能通过offer与接受offer达成，完成交易主动权在owner
+  普通定价模式 other num：nft owner设置初始价格，出价者给offer需要满足比当前最佳offer金额更高，或者直接通过simpleBuyNFT()按startPrice标价购买 可以通过offer或直接购买达成，完成交易主动权在双方
   */
   enum AuctionsType {England, Netherlands, Simple}
   enum OfferStatus {available, fulfilled, cancelled}
@@ -110,8 +110,8 @@ function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOwn
     //0.check amount
     require(msg.value == _price, 'The ETH amount should match with the offer Price');
     //1.if new price should be the best price
-    //如果没有offer，找到owner设置的起始价格作为当前最佳价格
-    uint  _currentBestPrice = tokenIdToStartPrice[_id];
+    //如果没有offer，当前最佳价格为0
+    uint  _currentBestPrice = 0;
     uint currentBestOfferId = tokenIdToBestOfferId[_id];
     if(currentBestOfferId > 0){//如果有offer，更新为最佳offer价格
        _Offer memory currentBestOffer = allOffers[currentBestOfferId];
@@ -156,8 +156,8 @@ function changePriceForSimpleAuctionsType(uint _id,  uint _price) public onlyOwn
     //0.check if balance is enough
     require(userFunds[msg.sender] + msg.value >= _price, 'The ETH amount should match with the offer Price');
     //1.if new price is the best price
-    //如果没有offer，找到owner设置的起始价格作为当前最佳价格
-    uint  _currentBestPrice = tokenIdToStartPrice[_id];
+    //如果没有offer，当前最佳价格为0
+    uint  _currentBestPrice = 0;
     uint currentBestOfferId = tokenIdToBestOfferId[_id];
     if(currentBestOfferId > 0){//如果有offer，更新为最佳offer价格
        _Offer memory currentBestOffer = allOffers[currentBestOfferId];

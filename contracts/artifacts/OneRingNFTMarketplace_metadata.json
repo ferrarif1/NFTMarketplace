@@ -733,11 +733,11 @@
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0x518b2134a4b64f9166cea519da03d1c6b04bf3ae6efb86548340bc29f5b3e325",
+			"keccak256": "0x7c5a5e4df8019e105508b4d6fda91904e692720d8094792604b92071e6e66788",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://bac233d6c9037b38f7306bc6131059265fdee422b4712090552dd72a5f4cea34",
-				"dweb:/ipfs/QmTn6CDeDzgqPD3t8EDMYtV3aGg8tNqWLx6H6PiZeUaxLj"
+				"bzz-raw://d325c4be3d092dbac1b80f10cc95d3b98c11c8ef17c3370da1aa24bfe5aca408",
+				"dweb:/ipfs/Qmcg7cUzkZdwaHmVPBMmzo2VBDhz5Y6sJH72RccMLUG1aS"
 			]
 		}
 	},

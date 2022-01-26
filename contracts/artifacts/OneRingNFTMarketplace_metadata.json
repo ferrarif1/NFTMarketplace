@@ -47,7 +47,7 @@
 					{
 						"indexed": false,
 						"internalType": "uint256",
-						"name": "id",
+						"name": "tokenId",
 						"type": "uint256"
 					},
 					{
@@ -84,7 +84,7 @@
 					{
 						"indexed": false,
 						"internalType": "uint256",
-						"name": "id",
+						"name": "tokenId",
 						"type": "uint256"
 					},
 					{
@@ -109,7 +109,7 @@
 					{
 						"indexed": false,
 						"internalType": "uint256",
-						"name": "id",
+						"name": "tokenId",
 						"type": "uint256"
 					},
 					{
@@ -187,7 +187,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_id",
+						"name": "_tokenId",
 						"type": "uint256"
 					},
 					{
@@ -225,7 +225,7 @@
 							},
 							{
 								"internalType": "uint256",
-								"name": "id",
+								"name": "tokenId",
 								"type": "uint256"
 							},
 							{
@@ -282,7 +282,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_id",
+						"name": "_tokenId",
 						"type": "uint256"
 					},
 					{
@@ -307,7 +307,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_id",
+						"name": "_tokenId",
 						"type": "uint256"
 					},
 					{
@@ -343,7 +343,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_id",
+						"name": "_tokenId",
 						"type": "uint256"
 					},
 					{
@@ -361,7 +361,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_id",
+						"name": "_tokenId",
 						"type": "uint256"
 					},
 					{
@@ -394,7 +394,7 @@
 							},
 							{
 								"internalType": "uint256",
-								"name": "id",
+								"name": "tokenId",
 								"type": "uint256"
 							},
 							{
@@ -457,7 +457,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_NFTid",
+						"name": "_tokenId",
 						"type": "uint256"
 					}
 				],
@@ -557,19 +557,6 @@
 					}
 				],
 				"name": "transferOwnership",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "_id",
-						"type": "uint256"
-					}
-				],
-				"name": "withdrawNFTFromSellList",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -737,11 +724,11 @@
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0x02449eb2591d5527de94808b9ce4d99c667847243b2c0ec60f37d1b72ffee787",
+			"keccak256": "0xcff570758bd58af06121c9b08f92daabd55aa87631051a7196dac0cc3ca1a7e8",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ef3651b8c24d7cdc2f41d223357e970117e300461e5fbf075ad1506989aac801",
-				"dweb:/ipfs/QmdmNRYCayUPs4eCDuUuKL8LeQpw5DLvH5nm1E2FmKri6v"
+				"bzz-raw://e279aa7b65c856fb69e8da0190b3cd8ea08e71dce11c748229ab88e4c5beaf64",
+				"dweb:/ipfs/QmPxmAzVbDhyyXTPxeyhdd887ypmSbMFFqwuSXumRLkzhL"
 			]
 		}
 	},

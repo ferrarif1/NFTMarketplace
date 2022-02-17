@@ -51,6 +51,9 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     address collectionOwner = _collectionNameToCollectionOwner[collectionName];
     require(msg.sender == collectionOwner || collectionOwner == address(0));
     _tokenIdToCollectionName[tokenId] = collectionName;
+    if(collectionOwner == address(0)){
+      _collectionNameToCollectionOwner[collectionName] = msg.sender;
+    }
   }
 
   function registerCollection(string collectionName)public{

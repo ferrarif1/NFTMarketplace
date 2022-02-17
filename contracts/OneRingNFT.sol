@@ -9,8 +9,10 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
   string[] public tokenURIs;
-  mapping(string => bool) _tokenURIExists;
-  mapping(uint => string) _tokenIdToTokenURI;
+  mapping(string => bool)public _tokenURIExists;
+  mapping(uint => string)public _tokenIdToTokenURI;
+  mapping(uint => string)public _tokenIdToCollectionName;
+  mapping(string => address)private _collectionNameToCollectionOwner;
 
   constructor() ERC721("One Ring Collection", "ORC") {}
 
@@ -43,6 +45,16 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     _tokenIdToTokenURI[newItemId] = _tokenURI;
     _safeMint(msg.sender, newItemId);
     _tokenURIExists[_tokenURI] = true;
+  }
+
+  function addTokenIdToCollection(uint tokenId, string collectionName) public{
+    address collectionOwner = _collectionNameToCollectionOwner[collectionName];
+    require(msg.sender == collectionOwner || collectionOwner == address(0));
+    _tokenIdToCollectionName[tokenId] = collectionName;
+  }
+
+  function registerCollection(string collectionName)public{
+    _collectionNameToCollectionOwner[collectionName] = msg.sender;
   }
 
 

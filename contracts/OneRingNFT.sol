@@ -29,10 +29,6 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     return _tokenIdToTokenURI[tokenId];
   }
 
-  function balanceOf(address owner) public view virtual override returns (uint256) {
-    return super.balanceOf(owner);
-  }
-
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);
   }
@@ -47,7 +43,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     _tokenURIExists[_tokenURI] = true;
   }
 
-  function addTokenIdToCollection(uint tokenId, string collectionName) public{
+  function addTokenIdToCollection(uint tokenId, string memory collectionName) public{
     address collectionOwner = _collectionNameToCollectionOwner[collectionName];
     require(msg.sender == collectionOwner || collectionOwner == address(0), 'msg.sender should be collection owner or collectionOwner is address(0)');
     _tokenIdToCollectionName[tokenId] = collectionName;
@@ -56,13 +52,13 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     }
   }
 
-  function registerNewCollection(string collectionName)public{
+  function registerNewCollection(string memory collectionName)public{
     address collectionOwner = _collectionNameToCollectionOwner[collectionName];
     require(collectionOwner == address(0), 'collection already exists');
     _collectionNameToCollectionOwner[collectionName] = msg.sender;
   }
 
-  function changeCollectionOwner(string collectionName, address newOwner)public{
+  function changeCollectionOwner(string memory collectionName, address newOwner)public{
     address oldCollectionOwner = _collectionNameToCollectionOwner[collectionName];
     require(msg.sender == oldCollectionOwner, 'msg.sender should be old collection owner');
     _collectionNameToCollectionOwner[collectionName] = newOwner;

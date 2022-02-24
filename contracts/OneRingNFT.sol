@@ -42,27 +42,32 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     _safeMint(msg.sender, newItemId);
     _tokenURIExists[_tokenURI] = true;
   }
-
+  //NFT加入到Collection 
+  //这种情况下 NFT可以更改为新的Collection
   function addTokenIdToCollection(uint tokenId, string memory collectionName) public{
     address collectionOwner = _collectionNameToCollectionOwner[collectionName];
-    require(msg.sender == collectionOwner || collectionOwner == address(0), 'msg.sender should be collection owner or collectionOwner is address(0)');
+    //需要Collection存在
+    require(collectionOwner != address(0),'This collection does not exist !');
+    //调用者为Collection Owner
+    require(msg.sender == collectionOwner, 'msg.sender should be collection owner');
+    //调用者同时还是NFT Owner
+    require(msg.sender == super.ownerOf(tokenId));
     _tokenIdToCollectionName[tokenId] = collectionName;
     if(collectionOwner == address(0)){
       _collectionNameToCollectionOwner[collectionName] = msg.sender;
     }
   }
-
+  //注册新Collection
   function registerNewCollection(string memory collectionName)public{
     address collectionOwner = _collectionNameToCollectionOwner[collectionName];
+    //要求Collection不存在
     require(collectionOwner == address(0), 'collection already exists');
     _collectionNameToCollectionOwner[collectionName] = msg.sender;
   }
-
-  function changeCollectionOwner(string memory collectionName, address newOwner)public{
-    address oldCollectionOwner = _collectionNameToCollectionOwner[collectionName];
-    require(msg.sender == oldCollectionOwner, 'msg.sender should be old collection owner');
-    _collectionNameToCollectionOwner[collectionName] = newOwner;
+  //查询Collection的Owner
+  function ownerOfCollectionName(string memory collectionName) public view  returns(address){
+    address collectionOwner = _collectionNameToCollectionOwner[collectionName];
+    return collectionOwner;
   }
-
 
 }

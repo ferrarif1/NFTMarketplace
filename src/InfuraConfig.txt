@@ -1,0 +1,12 @@
+PROJECT ID
+de1e8657274a494aa59476341cafc010
+PROJECT SECRET
+4cd2476c703249c1b292d214e3d5f3b9
+ENDPOINTS
+Mainnet
+https://mainnet.infura.io/v3/de1e8657274a494aa59476341cafc010
+wss://mainnet.infura.io/ws/v3/de1e8657274a494aa59476341cafc010
+
+
+https://goerli.infura.io/v3/de1e8657274a494aa59476341cafc010
+wss://goerli.infura.io/ws/v3/de1e8657274a494aa59476341cafc010

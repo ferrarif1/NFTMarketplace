@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "./OneRingNFT.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+
 contract OneRingNFTMarketplace is Ownable {
   using Counters for Counters.Counter;
   Counters.Counter private _offerIds;
@@ -12,11 +13,17 @@ contract OneRingNFTMarketplace is Ownable {
   Netherlands -> decrease price
   Simple -> Fixed price
 
-  英格兰拍卖 0：nft owner设置初始起拍价格，竞拍者逐步提高价格发起offer，价高者得 只能通过offer与接受offer达成，完成交易主动权在owner
-  荷兰拍卖 1： nft owner设置初始价格，竞拍者给出满足该价格的offer或者价格更低的offer，nft owner可以主动降价，直到有双方都满意的价格出现 只能通过offer与接受offer达成，完成交易主动权在owner
-  普通定价模式 other num：nft owner设置初始价格，出价者给offer需要满足比当前最佳offer金额更高，或者直接通过simpleBuyNFT()按startPrice标价购买 可以通过offer或直接购买达成，完成交易主动权在双方
+  英格兰拍卖 0：nft owner设置初始起拍价格startPrice，竞拍者逐步提高价格发起offer[ >=当前最高offer金额 ]，价高者得 只能通过发起offer与接受offer达成，完成交易主动权在owner
+  荷兰拍卖 1： nft owner设置初始价格startPrice，竞拍者给出[ <=startPrice && >=当前最高offer金额 ]的offer，nft owner可以主动降价，直到有双方都满意的价格出现 只能通过发起offer与接受offer达成，完成交易主动权在owner
+  普通定价模式 other num：nft owner设置初始价格startPrice，出价者给offer需要满足[ <=startPrice && >=当前最高offer金额 ]，或者直接通过simpleBuyNFT()按startPrice标价购买 可以通过offer或直接购买达成，完成交易主动权在双方
   */
   enum AuctionsType {England, Netherlands, Simple}
+  /*
+  offer的状态
+  available  刚发起的offer处于有效状态
+  fulfilled  被接受
+  cancelled  被取消
+  */
   enum OfferStatus {available, fulfilled, cancelled}
   
   mapping (uint => _Offer)private allOffers;//全部offer
@@ -26,8 +33,6 @@ contract OneRingNFTMarketplace is Ownable {
   mapping (address => uint) private userFunds;//用户在合约的存款余额
   mapping (uint => AuctionsType) private tokenIdToAuctionsType;//nft的拍卖模式
   mapping (uint => address)private tokenIdToOriginalAddress;//记录addtoselllist后的nft的原所有者
-
-  OneRingNFT oneRingNFT;
   
   struct _Offer {
     uint offerId;  //offer id
@@ -36,23 +41,23 @@ contract OneRingNFTMarketplace is Ownable {
     uint price;    
     OfferStatus offerstatus;
   }
-
-  event Offer(
-    uint offerId,
-    uint tokenId,
-    address user,
-    uint price,
-    OfferStatus offerstatus
-  );
-
+  /*
+  event事件 用于链上行为的通知
+  */
+  event Offer( uint offerId, uint tokenId, address user, uint price, OfferStatus offerstatus);
   event OfferFilled(uint offerId, uint tokenId, address newOwner);
   event OfferCancelled(uint offerId, uint tokenId, address owner);
   event ClaimFunds(address user, uint amount);
 
+  //OneRingNFT合约的实例，用于调用相关铸造、转账等函数
+  OneRingNFT oneRingNFT;
+  /*
+  OneRingNFTMarketplace合约的构造函数，传入OneRingNFT合约的部署地址_oneRingNFT
+  */
   constructor(address _oneRingNFT) payable{
     oneRingNFT = OneRingNFT(_oneRingNFT);
   }
-
+  //限制函数调用者为某NFT的拥有者
   modifier onlyOwnerOf(uint _tokenId){
       address ownerOfNFT =  oneRingNFT.ownerOf(_tokenId);
       require(msg.sender == ownerOfNFT);
@@ -82,13 +87,7 @@ contract OneRingNFTMarketplace is Ownable {
      }
      tokenIdToStartPrice[_tokenId] = _price;
   }
-// /*
-//   取消销售，从合约取回NFT
-//   没有offer的情况
-// */
-//   function withdrawNFTFromSellList(uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
-//     oneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
-//   }
+
 /*
   decrease price for AuctionsType.Netherlands
   荷兰拍卖模式下 NFT拥有者主动降低价格
@@ -310,7 +309,7 @@ reject the best price means cancel all the offer
   function cancelAllOfferAndWithdrawFromSellList(uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
     //NFT从合约取回
     oneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
-    //cancel every offers , refund or update userFunds 取消所有offer
+    //cancel every offers , refund or update userFunds 取消所有offer 相应offer的金额加到对应offer发起者的存款userFunds里
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
@@ -325,6 +324,7 @@ reject the best price means cancel all the offer
   }
 /*
 claim Funds
+取回在合约的存款余额
 */
   function claimFunds() public {
     require(userFunds[msg.sender] > 0, 'This user has no funds to be claimed');

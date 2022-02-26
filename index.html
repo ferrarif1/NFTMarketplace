@@ -31,7 +31,7 @@
         OneRingNFTMarketPlaceAddress = new web3js.eth.Contract(oneRingNftMarketplaceABI, OneRingNFTMarketPlaceAddress);
         
         //test
-        getOwnerOfNFTid(1).then(function(result, error) {
+        getOwnerOfNFTId(1).then(function(result, error) {
          if(error){
            console.log(error);
          }
@@ -41,7 +41,7 @@
            if(strA == strB){
               console.log("NFT not exist!")
            }else{
-              console.log("OwnerOfNFTid 1: " + JSON.stringify(result))
+              console.log("OwnerOfNFTId 1: " + JSON.stringify(result))
            }
          }
         });
@@ -77,7 +77,7 @@
 
 /***********************************************************      UI     **************************************************************************/
 
-    const CreateOneRingNFTBtn = document.querySelector('.CreateOneRingNFTBtn');
+     const CreateOneRingNFTBtn = document.querySelector('.CreateOneRingNFTBtn');
 
      CreateOneRingNFTBtn.addEventListener('click', () => {
         mintOneRingNFT("ipfs://ipfsHash2").then(function(result, error) {

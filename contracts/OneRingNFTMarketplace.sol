@@ -74,10 +74,16 @@ contract OneRingNFTMarketplace is Ownable {
   add to sell list and set start price, choose AuctionsType
   withdraw NFT from sell list
   将NFT加入销售列表：NFT从个人地址转入合约地址，设置初始价格，拍卖类型
+  @_tokenId NFT id
+  @_price   StartPrice
+  @_typeNum 拍卖模式 0-England 1-Netherlands other-Simple
 */
   function addNFTToSellList(uint _tokenId, uint _price, uint _typeNum) public onlyOwnerOf(_tokenId){
+     //NFT转入合约地址
      oneRingNFT.transferFrom(msg.sender, address(this), _tokenId); 
+     //存储NFT的原拥有者
      tokenIdToOriginalAddress[_tokenId] = msg.sender;
+     //设置拍卖模式
      if(_typeNum == 0){
        tokenIdToAuctionsType[_tokenId] = AuctionsType.England;
      }else if(_typeNum == 1){
@@ -85,6 +91,7 @@ contract OneRingNFTMarketplace is Ownable {
      }else{
        tokenIdToAuctionsType[_tokenId] = AuctionsType.Simple;
      }
+     //设置起拍价
      tokenIdToStartPrice[_tokenId] = _price;
   }
 
@@ -114,16 +121,18 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
   *** 新offer必为bestOffer ***
 */
   function makeOffer(uint _tokenId, uint _price) public payable{
-    //0.check amount
+    //0.check amount 检查付款金额是不是符合消息中所填的offer金额
     require(msg.value >= _price, 'The ETH amount should match with the offer Price');
-    //1.if new price should be the best price
+    //1. new price should be the best price 新offer应该是当前最佳价格
     //如果没有offer，当前最佳价格为0
     uint  _currentBestPrice = 0;
     uint currentBestOfferId = tokenIdToBestOfferId[_tokenId];
-    if(currentBestOfferId > 0){//如果有offer，更新为最佳offer价格
+    //如果有offer，更新为最佳offer价格
+    if(currentBestOfferId > 0){
        _Offer memory currentBestOffer = allOffers[currentBestOfferId];
        _currentBestPrice = currentBestOffer.price;
     }
+    //根据拍卖模式判断价格是否合法
     uint startPrice = tokenIdToStartPrice[_tokenId];
     AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
     if(_auctionsType == AuctionsType.England){
@@ -151,7 +160,6 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     tokenIdToOfferIds[_tokenId] = offerIdsOfId;
     //更新最佳Offer id
     tokenIdToBestOfferId[_tokenId] = newOfferId;
-    
     //4.emit event
     emit Offer(newOfferId, _tokenId, msg.sender, _price, OfferStatus.available);
   }
@@ -343,6 +351,7 @@ request owner of nftid
   }
 /*
 request NFT balance of owner
+某地址持有oneRingNFT的数量
 */
  function NFTbalanceOf(address _owner) public view returns (uint256) {
     uint256 balance =  oneRingNFT.balanceOf(_owner);
@@ -350,6 +359,7 @@ request NFT balance of owner
  }
  /*
 request ETH balance of owner
+用户在合约的存款余额
 */
  function ETHbalanceOf(address _owner) public view returns (uint256) {
     uint256 balance =  userFunds[_owner];

@@ -291,6 +291,24 @@
 						"type": "uint256"
 					}
 				],
+				"name": "changePriceForEnglandAuctionsType",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_price",
+						"type": "uint256"
+					}
+				],
 				"name": "changePriceForSimpleAuctionsType",
 				"outputs": [],
 				"stateMutability": "nonpayable",
@@ -435,6 +453,25 @@
 						"internalType": "uint256[]",
 						"name": "",
 						"type": "uint256[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_tokenId",
+						"type": "uint256"
+					}
+				],
+				"name": "originalOwnerOfNFTId",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
 					}
 				],
 				"stateMutability": "view",
@@ -716,19 +753,19 @@
 			]
 		},
 		"contracts/OneRingNFT.sol": {
-			"keccak256": "0x794210a74dbc72e72138f23be1d21036fd63b5a95345aaaa2faeef9420d32e9a",
+			"keccak256": "0x3dbc1fa016fc5e1f3c23cd868dbd0e08719978b0307ded8ec2a6838c1fad34d6",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b478ef8661d18fa06ebabe2becb44619c245da869e010770ac9f4d6e75df5174",
-				"dweb:/ipfs/QmVXzM62UZN5fpuX7fTAoF8oEdqvTwcpzGwfhqBbcJWGLA"
+				"bzz-raw://69bc4e708c9c91f245827961f2b71cfada6c2afdd701384e595c6c936d107bd8",
+				"dweb:/ipfs/QmXJ3BCLyEztzBHusF6o88rqvpXkng6eYU4cLnWhQu5BKF"
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0xcff570758bd58af06121c9b08f92daabd55aa87631051a7196dac0cc3ca1a7e8",
+			"keccak256": "0x99acc3e93d34f414707f4f2341976c36f22b4cf30e10789daf88b7451bcb83c1",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e279aa7b65c856fb69e8da0190b3cd8ea08e71dce11c748229ab88e4c5beaf64",
-				"dweb:/ipfs/QmPxmAzVbDhyyXTPxeyhdd887ypmSbMFFqwuSXumRLkzhL"
+				"bzz-raw://fb530d1f28e2bc5f4f42abd0ea5f97978b727f5c8e5f0b29a1c88658e62761f6",
+				"dweb:/ipfs/QmdpWWycmwDezVgXXpjqYyTj2LzY96wSJizJUFsaP3KkZh"
 			]
 		}
 	},

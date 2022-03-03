@@ -26,7 +26,7 @@ contract OneRingNFTMarketplace is Ownable {
   */
   enum OfferStatus {available, fulfilled, cancelled}
   
-  mapping (uint => _Offer)private allOffers;//全部offer
+  mapping (uint => _Offer)private allOffers;//全部offer offerId->Offer
   mapping (uint => uint[]) private tokenIdToOfferIds;//nft对应的全部offer的id
   mapping (uint => uint) private tokenIdToBestOfferId;//最佳Offer id
   mapping (uint => uint) private tokenIdToStartPrice;//nft owner设置的初始价格

@@ -31,7 +31,7 @@
         OneRingNFTMarketPlaceAddress = new web3js.eth.Contract(oneRingNftMarketplaceABI, OneRingNFTMarketPlaceAddress);
         
         //test
-        getOwnerOfNFTId(1).then(function(result, error) {
+        getOwnerOfNFTid(1).then(function(result, error) {
          if(error){
            console.log(error);
          }
@@ -53,7 +53,7 @@
       //查询（View类型）类型的函数调用
       //should return  0x892953Cb6cDC87c8aD7c4aAfb06A716CBa231D8a
       function getOwnerOfNFTid(id) {
-        return OneRingNFT.methods.ownerOfCollectionName("testCollection").call()
+        return OneRingNFT.methods.ownerOf(id).call()
       }
 
       //交易类型合约调用
@@ -80,7 +80,7 @@
      const CreateOneRingNFTBtn = document.querySelector('.CreateOneRingNFTBtn');
 
      CreateOneRingNFTBtn.addEventListener('click', () => {
-        mintOneRingNFT("ipfs://ipfsHash2").then(function(result, error) {
+        mintOneRingNFT("ipfs://ipfsHash1").then(function(result, error) {
          if(error){
            console.log(error)
          }

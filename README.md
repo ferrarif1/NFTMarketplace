@@ -6,5 +6,5 @@ Support three auction modes
  OneRingNFTMarketplace.  
  https://ropsten.etherscan.io/address/0x88335747191cdd3e5273fe0e2f4d160a1871f1f8
  
-## see index.html for js -- interact with --> contract  
+## see index.html  
    <div align=center><img src="https://github.com/ferrarif1/NFTMarketplace/blob/main/public/Logo1.png" width="380px"></div>

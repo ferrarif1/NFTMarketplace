@@ -69,6 +69,17 @@ contract OneRingNFTMarketplace is Ownable {
       require(msg.sender == originalOwnerOfNFT);
       _;
   }
+  /*
+  防止重入攻击
+  */
+  bool public locked;
+ 
+  modifier noReentrancy(){
+    require(!locked, 'No reentrancy');
+    locked = true;
+    _;
+    locked = false;
+  }
  /************************************************************************ NFT 上架 ***************************************************************/
 /*
   add to sell list and set start price, choose AuctionsType
@@ -279,11 +290,13 @@ only cancel, still on sale(NFT hold by contract)
       emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
     }
   }
+
+ 
 /*
 cancel one's own Offer
 撤销自己给出的offer
 */
-  function cancelOwnOffer(uint _offerId)public{
+  function cancelOwnOffer(uint _offerId)public noReentrancy(){
     _Offer storage currentOffer = allOffers[_offerId];
     require(msg.sender == currentOffer.user, 'msg.sender should be owner of this offer');
     require(currentOffer.offerId == _offerId, 'The offer must exist');

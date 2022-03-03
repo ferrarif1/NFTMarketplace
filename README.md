@@ -2,7 +2,7 @@
 Support three auction modes    
 ## see deploy记录.pdf       
  One Ring Collection (ORC).   
- https://ropsten.etherscan.io/address/0x53bd16e7136454cf57f7a2aa6bedc76ec1109c6a 
+ https://ropsten.etherscan.io/address/0x53bd16e7136454cf57f7a2aa6bedc76ec1109c6a  
  OneRingNFTMarketplace.  
  https://ropsten.etherscan.io/address/0x88335747191cdd3e5273fe0e2f4d160a1871f1f8
  

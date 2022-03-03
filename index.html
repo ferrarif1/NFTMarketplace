@@ -31,7 +31,7 @@
         OneRingNFTMarketPlaceAddress = new web3js.eth.Contract(oneRingNftMarketplaceABI, OneRingNFTMarketPlaceAddress);
         
         //test
-        getOwnerOfNFTid(1).then(function(result, error) {
+        ownerOf(1).then(function(result, error) {
          if(error){
            console.log(error);
          }
@@ -40,47 +40,287 @@
            var strB = new String(result);
            if(strA == strB){
               console.log("NFT not exist!")
+           }else if(OneRingNFTMarketPlaceAddress == strB){
+              console.log("Current OwnerOfNFTId is OneRingNFTMarketPlaceAddress" + OneRingNFTMarketPlaceAddress);
            }else{
-              console.log("OwnerOfNFTId 1: " + JSON.stringify(result))
+              console.log("Current OwnerOfNFTId is : " + JSON.stringify(result));
            }
          }
         });
         
         //获取metamask账户
         getAccount();
-      
-      }
-      //查询（View类型）类型的函数调用
-      //should return  0x892953Cb6cDC87c8aD7c4aAfb06A716CBa231D8a
-      function getOwnerOfNFTid(id) {
-        return OneRingNFT.methods.ownerOf(id).call()
       }
 
-      //交易类型合约调用
+       //转账或其他操作前先获取账号
+       async function getAccount() {
+          accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        }
+/*
+涉及交易的直接调用合约完成
+查询的很少一部分调用合约，另外一部分后台数据库完成
+以下全部列出
+*/      
+/***********************************************************     OneRingNFT     **************************************************************************/
+      
+///交易
       function mintOneRingNFT(tokenUrl) {
         $("#txStatus").text("Creating OneRingNFT on the blockchain. This may take a while...");
         //value = 1000000000000000 = 0.001 ETH
         return OneRingNFT.methods.safeMint(tokenUrl)
         .send({ from: web3.eth.accounts[0]})
         .on("receipt", function(receipt) {
-          $("#txStatus").text("Successfully minted ! tokenUrl = " + tokenUrl);
+          $("#txStatus").text(receipt);
         })
         .on("error", function(error) {
           $("#txStatus").text(error);
         });
       }
+
+      function registerNewCollection(collectionName) {
+        return OneRingNFT.methods.registerNewCollection(collectionName)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function addTokenIdToCollection(tokenId, collectionName) {
+        return OneRingNFT.methods.addTokenIdToCollection(tokenId, collectionName)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+///查询      
+      //NFT 没有上架调用这个 上架后调用OneRingNFTMarketPlace的originalOwnerOfNFTId
+      //如果上架了，将返回合约地址
+      function ownerOf(id) {
+        return OneRingNFT.methods.ownerOf(id).call();
+      }
+
+      function ownerOfCollectionName(collectionName) {
+        return OneRingNFT.methods.ownerOfCollectionName(collectionName).call();
+      }
+
+      function tokenURI(id) {
+        return OneRingNFT.methods.tokenURI(id).call();
+      }
+
+
+/***********************************************************     OneRingNFTMarketPlace     **************************************************************************/
+///交易
+      function addNFTToSellList(_tokenId, _price, _typeNum) {
+        return OneRingNFTMarketPlace.methods.addNFTToSellList((_tokenId, _price, _typeNum)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function changePriceForEnglandAuctionsType(_tokenId, _price) {
+        return OneRingNFTMarketPlace.methods.changePriceForEnglandAuctionsType(_tokenId, _price)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function decreasePriceForNetherlandsAuctionsType(_tokenId, _price) {
+        return OneRingNFTMarketPlace.methods.decreasePriceForNetherlandsAuctionsType(_tokenId, _price)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function changePriceForSimpleAuctionsType(_tokenId, _price) {
+        return OneRingNFTMarketPlace.methods.changePriceForSimpleAuctionsType(_tokenId, _price)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function makeOffer(_tokenId, _price) {
+        return OneRingNFTMarketPlace.methods.makeOffer(_tokenId, _price)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function makeOfferWithUserFundsAndEther(_tokenId, _price) {
+        return OneRingNFTMarketPlace.methods.makeOfferWithUserFundsAndEther(_tokenId, _price)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function fillOfferByNFTOwner(_offerId, _tokenId) {
+        return OneRingNFTMarketPlace.methods.fillOfferByNFTOwner(_offerId, _tokenId)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function rejectAllOffers(_tokenId) {
+        return OneRingNFTMarketPlace.methods.rejectAllOffers(_tokenId)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function cancelOwnOffer(_offerId) {
+        return OneRingNFTMarketPlace.methods.cancelOwnOffer(_offerId)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function simpleBuyNFT(_tokenId) {
+        return OneRingNFTMarketPlace.methods.simpleBuyNFT(_tokenId)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function cancelAllOfferAndWithdrawFromSellList(_tokenId) {
+        return OneRingNFTMarketPlace.methods.cancelAllOfferAndWithdrawFromSellList(_tokenId)
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+      function claimFunds() {
+        return OneRingNFTMarketPlace.methods.claimFunds()
+        .send({ from: web3.eth.accounts[0]})
+        .on("receipt", function(receipt) {
+          $("#txStatus").text(receipt);
+        })
+        .on("error", function(error) {
+          $("#txStatus").text(error);
+        });
+      }
+
+///查询 
+/*
+request owner of nftid
+NFT的当前拥有者
+*/ 
+      function ownerOfNFTId(_tokenId) {
+        return OneRingNFTMarketPlace.methods.ownerOfNFTId(_tokenId).call();
+      }
+/*
+request original owner of nftid
+NFT上架后 将被合约地址持有 查询NFT的原拥有者
+*/
+      function originalOwnerOfNFTId(_tokenId) {
+        return OneRingNFTMarketPlace.methods.originalOwnerOfNFTId(_tokenId).call();
+      }
+/*
+request NFT balance of owner
+某地址持有oneRingNFT的数量
+*/
+      function NFTbalanceOf(_owner) {
+        return OneRingNFTMarketPlace.methods.NFTbalanceOf(_owner).call();
+      }
+/*
+request ETH balance of owner
+用户在合约的存款余额
+*/
+      function ETHbalanceOf(_owner) {
+        return OneRingNFTMarketPlace.methods.ETHbalanceOf(_owner).call();
+      }
+/*
+  request tokenURI of nftid
+  NFT的元数据地址 通常为IPFS地址
+*/
+      function tokenURIOfNFTId(_tokenId) {
+        return OneRingNFTMarketPlace.methods.tokenURIOfNFTId(_tokenId).call();
+      }
+/*
+ request best price of nftid
+ 某NFT的当前最高Offer价格 返回OfferId
+*/
+      function bestOfferOfNFTId(_tokenId) {
+        return OneRingNFTMarketPlace.methods.bestOfferOfNFTId(_tokenId).call();
+      }
+/*
+ request all offers for nftid
+ 返回NFT的所有OfferId
+*/
+      function offerIdsOfNFTId(_tokenId) {
+        return OneRingNFTMarketPlace.methods.offerIdsOfNFTId(_tokenId).call();
+      }
+/*
+  request offer detail of offer id
+  返回特定Offer的细节数据
+*/
+      function offerDataOfOfferId(_Offerid) {
+        return OneRingNFTMarketPlace.methods.offerDataOfOfferId(_Offerid).call();
+      }
+
       
-        //转账或其他操作前先获取账号
-        async function getAccount() {
-          accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-        }
+
+
+/***********************************************************     Until     **************************************************************************/
+      function getRandomInt(max) {
+         return Math.floor(Math.random() * max);
+      }
 
 /***********************************************************      UI     **************************************************************************/
 
      const CreateOneRingNFTBtn = document.querySelector('.CreateOneRingNFTBtn');
 
      CreateOneRingNFTBtn.addEventListener('click', () => {
-        mintOneRingNFT("ipfs://ipfsHash1").then(function(result, error) {
+        mintOneRingNFT("ipfs://ipfsHash" + getRandomInt(10000000)).then(function(result, error) {
          if(error){
            console.log(error)
          }

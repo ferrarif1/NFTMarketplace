@@ -235,7 +235,7 @@ NFT由合约转给offer发起者，取消其他offer，相应用户余额增加
 */
   function fillOfferByNFTOwner(uint _offerId, uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
     //找到_offerId对应的offer
-    _Offer storage currentOffer = allOffers[_offerId];
+    _Offer memory currentOffer = allOffers[_offerId];
     require(currentOffer.offerId == _offerId, 'The offer must exist');
     require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
     //NFT转账给offer的发起人
@@ -246,7 +246,7 @@ NFT由合约转给offer发起者，取消其他offer，相应用户余额增加
     address originalOwnerOfNFT = tokenIdToOriginalAddress[_tokenId];
     userFunds[originalOwnerOfNFT] += currentOffer.price;
     //cancel other offers , refund or update userFunds 取消其他offer，相应发起人的合约存款余额增加
-    uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
+    uint[] storage offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer memory offerIndex = allOffers[offerIdOfIndex];

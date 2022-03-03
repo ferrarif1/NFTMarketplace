@@ -285,6 +285,24 @@ var oneRingNftMarketplaceABI = [
 				"type": "uint256"
 			}
 		],
+		"name": "changePriceForEnglandAuctionsType",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_price",
+				"type": "uint256"
+			}
+		],
 		"name": "changePriceForSimpleAuctionsType",
 		"outputs": [],
 		"stateMutability": "nonpayable",
@@ -429,6 +447,25 @@ var oneRingNftMarketplaceABI = [
 				"internalType": "uint256[]",
 				"name": "",
 				"type": "uint256[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "originalOwnerOfNFTId",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
 			}
 		],
 		"stateMutability": "view",

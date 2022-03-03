@@ -1449,7 +1449,10 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
     return super.supportsInterface(interfaceId);
   }
-
+  /*
+  获取tokenURI
+  @tokenId NFT的id
+  */
   function tokenURI(uint256 tokenId) public override view returns (string memory) {
     require(_exists(tokenId), 'ERC721Metadata: URI query for nonexistent token');
     return _tokenIdToTokenURI[tokenId];
@@ -1458,7 +1461,10 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);
   }
-
+  /*
+  铸造NFT 
+  @_tokenURI 传入ipfs地址作为tokenURL
+  */
   function safeMint(string memory _tokenURI) public {
     require(!_tokenURIExists[_tokenURI], 'The token URI should be unique');
     tokenURIs.push(_tokenURI);    
@@ -1468,29 +1474,42 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     _safeMint(msg.sender, newItemId);
     _tokenURIExists[_tokenURI] = true;
   }
-  //NFT加入到Collection 
-  //这种情况下 NFT可以更改为新的Collection
+  
+  /*
+  NFT加入到Collection 
+  @tokenId NFT的id
+  @collectionName 自定义collection名称
+  需要先调用registerNewCollection（）注册一个新collection 再将NFT加入进去
+  这种情况下 NFT可以更改为新的Collection
+  */
   function addTokenIdToCollection(uint tokenId, string memory collectionName) public{
     address collectionOwner = _collectionNameToCollectionOwner[collectionName];
-    //需要Collection存在
+    //需要Collection已存在
     require(collectionOwner != address(0),'This collection does not exist !');
     //调用者为Collection Owner
     require(msg.sender == collectionOwner, 'msg.sender should be collection owner');
     //调用者同时还是NFT Owner
-    require(msg.sender == super.ownerOf(tokenId));
+    require(msg.sender == super.ownerOf(tokenId), 'msg.sender should be NFT owner');
+    //NFT绑定到collection
     _tokenIdToCollectionName[tokenId] = collectionName;
-    if(collectionOwner == address(0)){
-      _collectionNameToCollectionOwner[collectionName] = msg.sender;
-    }
   }
-  //注册新Collection
+  
+  /*
+  注册新Collection
+  @collectionName 自定义collection名称
+  */
   function registerNewCollection(string memory collectionName)public{
     address collectionOwner = _collectionNameToCollectionOwner[collectionName];
     //要求Collection不存在
     require(collectionOwner == address(0), 'collection already exists');
     _collectionNameToCollectionOwner[collectionName] = msg.sender;
   }
-  //查询Collection的Owner
+  
+  /*
+  查询Collection的Owner
+  @collectionName 自定义collection名称
+  @return collection的注册账号地址
+  */
   function ownerOfCollectionName(string memory collectionName) public view  returns(address){
     address collectionOwner = _collectionNameToCollectionOwner[collectionName];
     return collectionOwner;
@@ -1504,6 +1523,7 @@ pragma solidity ^0.8.0;
 
 
 
+
 contract OneRingNFTMarketplace is Ownable {
   using Counters for Counters.Counter;
   Counters.Counter private _offerIds;
@@ -1512,22 +1532,26 @@ contract OneRingNFTMarketplace is Ownable {
   Netherlands -> decrease price
   Simple -> Fixed price
 
-  英格兰拍卖 0：nft owner设置初始起拍价格，竞拍者逐步提高价格发起offer，价高者得 只能通过offer与接受offer达成，完成交易主动权在owner
-  荷兰拍卖 1： nft owner设置初始价格，竞拍者给出满足该价格的offer或者价格更低的offer，nft owner可以主动降价，直到有双方都满意的价格出现 只能通过offer与接受offer达成，完成交易主动权在owner
-  普通定价模式 other num：nft owner设置初始价格，出价者给offer需要满足比当前最佳offer金额更高，或者直接通过simpleBuyNFT()按startPrice标价购买 可以通过offer或直接购买达成，完成交易主动权在双方
+  英格兰拍卖 0：nft owner设置初始起拍价格startPrice，竞拍者逐步提高价格发起offer[ >=当前最高offer金额 ]，价高者得 只能通过发起offer与接受offer达成，完成交易主动权在owner
+  荷兰拍卖 1： nft owner设置初始价格startPrice，竞拍者给出[ <=startPrice && >=当前最高offer金额 ]的offer，nft owner可以主动降价，直到有双方都满意的价格出现 只能通过发起offer与接受offer达成，完成交易主动权在owner
+  普通定价模式 other num：nft owner设置初始价格startPrice，出价者给offer需要满足[ <=startPrice && >=当前最高offer金额 ]，或者直接通过simpleBuyNFT()按startPrice标价购买 可以通过offer或直接购买达成，完成交易主动权在双方
   */
   enum AuctionsType {England, Netherlands, Simple}
+  /*
+  offer的状态
+  available  刚发起的offer处于有效状态
+  fulfilled  被接受
+  cancelled  被取消
+  */
   enum OfferStatus {available, fulfilled, cancelled}
   
-  mapping (uint => _Offer)private allOffers;//全部offer
+  mapping (uint => _Offer)private allOffers;//全部offer offerId->Offer
   mapping (uint => uint[]) private tokenIdToOfferIds;//nft对应的全部offer的id
   mapping (uint => uint) private tokenIdToBestOfferId;//最佳Offer id
   mapping (uint => uint) private tokenIdToStartPrice;//nft owner设置的初始价格
   mapping (address => uint) private userFunds;//用户在合约的存款余额
   mapping (uint => AuctionsType) private tokenIdToAuctionsType;//nft的拍卖模式
   mapping (uint => address)private tokenIdToOriginalAddress;//记录addtoselllist后的nft的原所有者
-
-  OneRingNFT oneRingNFT;
   
   struct _Offer {
     uint offerId;  //offer id
@@ -1536,23 +1560,23 @@ contract OneRingNFTMarketplace is Ownable {
     uint price;    
     OfferStatus offerstatus;
   }
-
-  event Offer(
-    uint offerId,
-    uint tokenId,
-    address user,
-    uint price,
-    OfferStatus offerstatus
-  );
-
+  /*
+  event事件 用于链上行为的通知
+  */
+  event Offer( uint offerId, uint tokenId, address user, uint price, OfferStatus offerstatus);
   event OfferFilled(uint offerId, uint tokenId, address newOwner);
   event OfferCancelled(uint offerId, uint tokenId, address owner);
   event ClaimFunds(address user, uint amount);
 
+  //OneRingNFT合约的实例，用于调用相关铸造、转账等函数
+  OneRingNFT oneRingNFT;
+  /*
+  OneRingNFTMarketplace合约的构造函数，传入OneRingNFT合约的部署地址_oneRingNFT
+  */
   constructor(address _oneRingNFT) payable{
     oneRingNFT = OneRingNFT(_oneRingNFT);
   }
-
+  //限制函数调用者为某NFT的拥有者
   modifier onlyOwnerOf(uint _tokenId){
       address ownerOfNFT =  oneRingNFT.ownerOf(_tokenId);
       require(msg.sender == ownerOfNFT);
@@ -1564,15 +1588,21 @@ contract OneRingNFTMarketplace is Ownable {
       require(msg.sender == originalOwnerOfNFT);
       _;
   }
- 
+ /************************************************************************ NFT 上架 ***************************************************************/
 /*
   add to sell list and set start price, choose AuctionsType
   withdraw NFT from sell list
   将NFT加入销售列表：NFT从个人地址转入合约地址，设置初始价格，拍卖类型
+  @_tokenId NFT id
+  @_price   StartPrice
+  @_typeNum 拍卖模式 0-England 1-Netherlands other-Simple
 */
   function addNFTToSellList(uint _tokenId, uint _price, uint _typeNum) public onlyOwnerOf(_tokenId){
+     //NFT转入合约地址
      oneRingNFT.transferFrom(msg.sender, address(this), _tokenId); 
+     //存储NFT的原拥有者
      tokenIdToOriginalAddress[_tokenId] = msg.sender;
+     //设置拍卖模式
      if(_typeNum == 0){
        tokenIdToAuctionsType[_tokenId] = AuctionsType.England;
      }else if(_typeNum == 1){
@@ -1580,15 +1610,21 @@ contract OneRingNFTMarketplace is Ownable {
      }else{
        tokenIdToAuctionsType[_tokenId] = AuctionsType.Simple;
      }
+     //设置起拍价
      tokenIdToStartPrice[_tokenId] = _price;
   }
-// /*
-//   取消销售，从合约取回NFT
-//   没有offer的情况
-// */
-//   function withdrawNFTFromSellList(uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
-//     oneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
-//   }
+
+  /************************************************************************ 修改起始价格 ***************************************************************/
+/*
+  英格兰模式下 修改起拍价格
+*/
+function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public onlyOriginalOwnerOf(_tokenId){
+     AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
+     require(_auctionsType == AuctionsType.England);
+     uint bestOfferId = tokenIdToBestOfferId[_tokenId];
+     require(bestOfferId != 0, "Can not change start price when you already have offers!");
+     tokenIdToStartPrice[_tokenId] = _price;
+  }
 /*
   decrease price for AuctionsType.Netherlands
   荷兰拍卖模式下 NFT拥有者主动降低价格
@@ -1609,22 +1645,26 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
      require(_auctionsType == AuctionsType.Simple);
      tokenIdToStartPrice[_tokenId] = _price;
   }
+
+  /************************************************************************ 发起Offer ***************************************************************/
 /*
   give offer 1, send eth to contract
   使用ether支付，给出竞拍某NFT的Offer
   *** 新offer必为bestOffer ***
 */
   function makeOffer(uint _tokenId, uint _price) public payable{
-    //0.check amount
+    //0.check amount 检查付款金额是不是符合消息中所填的offer金额
     require(msg.value >= _price, 'The ETH amount should match with the offer Price');
-    //1.if new price should be the best price
+    //1. new price should be the best price 新offer应该是当前最佳价格
     //如果没有offer，当前最佳价格为0
     uint  _currentBestPrice = 0;
     uint currentBestOfferId = tokenIdToBestOfferId[_tokenId];
-    if(currentBestOfferId > 0){//如果有offer，更新为最佳offer价格
+    //如果有offer，更新为最佳offer价格
+    if(currentBestOfferId > 0){
        _Offer memory currentBestOffer = allOffers[currentBestOfferId];
        _currentBestPrice = currentBestOffer.price;
     }
+    //根据拍卖模式判断价格是否合法
     uint startPrice = tokenIdToStartPrice[_tokenId];
     AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
     if(_auctionsType == AuctionsType.England){
@@ -1652,7 +1692,6 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     tokenIdToOfferIds[_tokenId] = offerIdsOfId;
     //更新最佳Offer id
     tokenIdToBestOfferId[_tokenId] = newOfferId;
-    
     //4.emit event
     emit Offer(newOfferId, _tokenId, msg.sender, _price, OfferStatus.available);
   }
@@ -1706,7 +1745,7 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     //4.emit event
     emit Offer(newOfferId, _tokenId, msg.sender, _price, OfferStatus.available);
   }
-
+/************************************************************************ 接受他人/拒绝他人/取消自己 Offer ***************************************************************/
 /*
 fill Offer by nft owner
 accept one offer and reject others
@@ -1715,7 +1754,7 @@ NFT由合约转给offer发起者，取消其他offer，相应用户余额增加
 */
   function fillOfferByNFTOwner(uint _offerId, uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
     //找到_offerId对应的offer
-    _Offer storage currentOffer = allOffers[_offerId];
+    _Offer memory currentOffer = allOffers[_offerId];
     require(currentOffer.offerId == _offerId, 'The offer must exist');
     require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
     //NFT转账给offer的发起人
@@ -1726,7 +1765,7 @@ NFT由合约转给offer发起者，取消其他offer，相应用户余额增加
     address originalOwnerOfNFT = tokenIdToOriginalAddress[_tokenId];
     userFunds[originalOwnerOfNFT] += currentOffer.price;
     //cancel other offers , refund or update userFunds 取消其他offer，相应发起人的合约存款余额增加
-    uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
+    uint[] storage offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer memory offerIndex = allOffers[offerIdOfIndex];
@@ -1773,6 +1812,7 @@ cancel one's own Offer
     emit OfferCancelled(_offerId, currentOffer.tokenId, msg.sender);
   }
 
+/************************************************************************ 普通模式下 按标价购买 ***************************************************************/
 /*
 simple buy NFT without offer
 AuctionsType.Simple模式下直接按标价购买NFT
@@ -1802,6 +1842,8 @@ function simpleBuyNFT(uint _tokenId) public payable{
      //NFT原拥有者置为0地址
     tokenIdToOriginalAddress[_tokenId] = address(0);
   }
+
+  /************************************************************************ NFT下架 ***************************************************************/
 /*
 cancel Offer and withdraw NFT from contract
 reject the best price means cancel all the offer
@@ -1810,7 +1852,7 @@ reject the best price means cancel all the offer
   function cancelAllOfferAndWithdrawFromSellList(uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
     //NFT从合约取回
     oneRingNFT.transferFrom(address(this), msg.sender, _tokenId);
-    //cancel every offers , refund or update userFunds 取消所有offer
+    //cancel every offers , refund or update userFunds 取消所有offer 相应offer的金额加到对应offer发起者的存款userFunds里
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
@@ -1823,33 +1865,48 @@ reject the best price means cancel all the offer
      //NFT原拥有者置为0地址
     tokenIdToOriginalAddress[_tokenId] = address(0);
   }
+
+  /************************************************************************ 取款 ***************************************************************/
 /*
 claim Funds
+取回在合约的存款余额
 */
   function claimFunds() public {
     require(userFunds[msg.sender] > 0, 'This user has no funds to be claimed');
     payable(msg.sender).transfer(userFunds[msg.sender]);
-    userFunds[msg.sender] = 0; 
     emit ClaimFunds(msg.sender, userFunds[msg.sender]);   
+    userFunds[msg.sender] = 0; 
   }
 
-  /********************************** 查询 **********************************/
+ /************************************************************************ 查询 ***************************************************************/
+
 /*
 request owner of nftid
+NFT的当前拥有者
 */
  function ownerOfNFTId(uint _tokenId)public view returns(address){
     address ownerOfNFT =  oneRingNFT.ownerOf(_tokenId);
     return ownerOfNFT;
   }
 /*
+request original owner of nftid
+NFT上架后 将被合约地址持有 查询NFT的原拥有者
+*/
+ function originalOwnerOfNFTId(uint _tokenId)public view returns(address){
+    address originalOwnerOfNFT =  tokenIdToOriginalAddress[_tokenId];
+    return originalOwnerOfNFT;
+  }
+/*
 request NFT balance of owner
+某地址持有oneRingNFT的数量
 */
  function NFTbalanceOf(address _owner) public view returns (uint256) {
     uint256 balance =  oneRingNFT.balanceOf(_owner);
     return balance;
  }
- /*
+/*
 request ETH balance of owner
+用户在合约的存款余额
 */
  function ETHbalanceOf(address _owner) public view returns (uint256) {
     uint256 balance =  userFunds[_owner];
@@ -1857,6 +1914,7 @@ request ETH balance of owner
  }
 /*
 request nftid of owner at index i
+用户 _owner 地址的第 index 个 NFT Id
 */
 function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns (uint256) {
     uint256 tokenId =  oneRingNFT.tokenOfOwnerByIndex(_owner, _index);
@@ -1864,6 +1922,7 @@ function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns
 }
 /*
   request tokenURI of nftid
+  NFT的元数据地址 通常为IPFS地址
 */
  function tokenURIOfNFTId(uint _tokenId)public view returns(string memory){
     string memory tokenURI =  oneRingNFT.tokenURI(_tokenId);
@@ -1872,7 +1931,8 @@ function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns
 
 
 /*
-request best price of nftid
+ request best price of nftid
+ 某NFT的当前最高Offer价格
 */
   function bestOfferOfNFTId(uint _tokenId)public view returns(_Offer memory){
     uint  bestOfferId = tokenIdToBestOfferId[_tokenId];
@@ -1880,7 +1940,8 @@ request best price of nftid
   }
 
 /*
-request all offers for nftid
+ request all offers for nftid
+ 返回NFT的所有OfferId
 */
   function offerIdsOfNFTId(uint _tokenId)public view returns(uint[] memory){
     uint[] memory offerIdsOfId = tokenIdToOfferIds[_tokenId];
@@ -1888,6 +1949,7 @@ request all offers for nftid
   }
 /*
   request offer detail of offer id
+  返回特定Offer的细节数据
 */
   function offerDataOfOfferId(uint _Offerid)public view returns(_Offer memory){
     _Offer memory offer = allOffers[_Offerid];
@@ -1898,7 +1960,9 @@ request all offers for nftid
   fallback () external payable{
     //revert();
   }
-  
+  /*
+  意外收到直接发送的ether到合约地址 将给相应用户增加存款余额
+  */
   receive() external payable{
     userFunds[msg.sender] += msg.value;
   }

@@ -1,10 +1,10 @@
-const NFTCollection = artifacts.require("NFTCollection");
-const NFTMarketplace = artifacts.require("NFTMarketplace");
+const OneRingNFT = artifacts.require("OneRingNFT");
+const NFTMarketplace = artifacts.require("OneRingNFTMarketplace");
 
 module.exports = async function (deployer) {
-  await deployer.deploy(NFTCollection);
+  await deployer.deploy(OneRingNFT);
 
-  const deployedNFT =  await NFTCollection.deployed();
+  const deployedNFT =  await OneRingNFT.deployed();
   const NFTAddress = deployedNFT.address;
   await deployer.deploy(NFTMarketplace, NFTAddress);
 };

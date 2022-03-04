@@ -24,8 +24,8 @@
 
     var OneRingNFT;
     var OneRingNFTMarketPlace;
-    var OneRingNFTAddress = "0x53bd16e7136454cf57f7a2aa6bedc76ec1109c6a";
-    var OneRingNFTMarketPlaceAddress = "0x88335747191cdd3e5273fe0e2f4d160a1871f1f8";
+    var OneRingNFTAddress = "0x92ADbC1067070aBbaa45323d8Cb8c681CA8F2c07";
+    var OneRingNFTMarketPlaceAddress = "0xC2b95812aD934BDbC54839340A8b4bbaB80Cef24";
 
     var web3js = window.web3 ? new Web3(window.web3.currentProvider) : new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/v3/de1e8657274a494aa59476341cafc010"));;
 
@@ -310,13 +310,7 @@
     function bestOfferOfNFTId(_tokenId) {
       return OneRingNFTMarketPlace.methods.bestOfferOfNFTId(_tokenId).call();
     }
-    /*
-     request all offers for nftid
-     返回NFT的所有OfferId
-    */
-    function offerIdsOfNFTId(_tokenId) {
-      return OneRingNFTMarketPlace.methods.offerIdsOfNFTId(_tokenId).call();
-    }
+    
     /*
       request offer detail of offer id
       返回特定Offer的细节数据

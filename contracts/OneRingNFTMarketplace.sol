@@ -296,7 +296,7 @@ only cancel, still on sale(NFT hold by contract)
 cancel one's own Offer
 撤销自己给出的offer
 */
-  function cancelOwnOffer(uint _offerId)public noReentrancy(){
+  function cancelOwnOffer(uint _offerId)public noReentrancy{
     _Offer storage currentOffer = allOffers[_offerId];
     require(msg.sender == currentOffer.user, 'msg.sender should be owner of this offer');
     require(currentOffer.offerId == _offerId, 'The offer must exist');

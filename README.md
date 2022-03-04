@@ -2,9 +2,9 @@
 Support three auction modes    
 ## see deploy记录.pdf       
  One Ring Collection (ORC).   
- https://ropsten.etherscan.io/address/0x53bd16e7136454cf57f7a2aa6bedc76ec1109c6a  
+ https://ropsten.etherscan.io/address/0x92adbc1067070abbaa45323d8cb8c681ca8f2c07  
  OneRingNFTMarketplace.  
- https://ropsten.etherscan.io/address/0x88335747191cdd3e5273fe0e2f4d160a1871f1f8
+ https://ropsten.etherscan.io/address/0xC2b95812aD934BDbC54839340A8b4bbaB80Cef24
  
 ## see index.html  
    <div align=center><img src="https://github.com/ferrarif1/NFTMarketplace/blob/main/public/Logo1.png" width="380px"></div>

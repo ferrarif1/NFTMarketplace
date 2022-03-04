@@ -26,13 +26,13 @@ contract OneRingNFTMarketplace is Ownable {
   */
   enum OfferStatus {available, fulfilled, cancelled}
   
-  mapping (uint => _Offer)private allOffers;//全部offer offerId->Offer
-  mapping (uint => uint[]) private tokenIdToOfferIds;//nft对应的全部offer的id
-  mapping (uint => uint) private tokenIdToBestOfferId;//最佳Offer id
-  mapping (uint => uint) private tokenIdToStartPrice;//nft owner设置的初始价格
-  mapping (address => uint) private userFunds;//用户在合约的存款余额
-  mapping (uint => AuctionsType) private tokenIdToAuctionsType;//nft的拍卖模式
-  mapping (uint => address)private tokenIdToOriginalAddress;//记录addtoselllist后的nft的原所有者
+  mapping (uint => _Offer) public allOffers;//全部offer offerId->Offer
+  mapping (uint => uint[]) public tokenIdToOfferIds;//nft对应的全部offer的id
+  mapping (uint => uint) public tokenIdToBestOfferId;//最佳Offer id
+  mapping (uint => uint) public tokenIdToStartPrice;//nft owner设置的初始价格
+  mapping (address => uint) public userFunds;//用户在合约的存款余额
+  mapping (uint => AuctionsType) public tokenIdToAuctionsType;//nft的拍卖模式
+  mapping (uint => address)public tokenIdToOriginalAddress;//记录addtoselllist后的nft的原所有者
   
   struct _Offer {
     uint offerId;  //offer id
@@ -114,7 +114,7 @@ function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public o
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
      require(_auctionsType == AuctionsType.England);
      uint bestOfferId = tokenIdToBestOfferId[_tokenId];
-     require(bestOfferId != 0, "Can not change start price when you already have offers!");
+     require(bestOfferId == 0, "Can not change start price when you already have offers!");
      tokenIdToStartPrice[_tokenId] = _price;
   }
 /*
@@ -246,7 +246,7 @@ NFT由合约转给offer发起者，取消其他offer，相应用户余额增加
 */
   function fillOfferByNFTOwner(uint _offerId, uint _tokenId) public onlyOriginalOwnerOf(_tokenId){
     //找到_offerId对应的offer
-    _Offer memory currentOffer = allOffers[_offerId];
+    _Offer storage currentOffer = allOffers[_offerId];
     require(currentOffer.offerId == _offerId, 'The offer must exist');
     require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
     //NFT转账给offer的发起人
@@ -260,12 +260,13 @@ NFT由合约转给offer发起者，取消其他offer，相应用户余额增加
     uint[] storage offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
-      _Offer memory offerIndex = allOffers[offerIdOfIndex];
+      _Offer storage offerIndex = allOffers[offerIdOfIndex];
       if(offerIndex.offerId != _offerId){
-        require(offerIndex.offerstatus == OfferStatus.available, 'Offer status should be available');
-        offerIndex.offerstatus = OfferStatus.cancelled;
-        userFunds[offerIndex.user] += offerIndex.price;
-        emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
+        if(offerIndex.OfferStatus == OfferStatus.available){
+          offerIndex.offerstatus = OfferStatus.cancelled;
+          userFunds[offerIndex.user] += offerIndex.price;
+          emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
+        } 
       }
     }
     //NFT原拥有者置为0地址
@@ -283,11 +284,12 @@ only cancel, still on sale(NFT hold by contract)
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
-      _Offer memory offerIndex = allOffers[offerIdOfIndex];
-      require(offerIndex.offerstatus == OfferStatus.available, 'Offer status should be available');
-      offerIndex.offerstatus = OfferStatus.cancelled;
-      userFunds[offerIndex.user] += offerIndex.price;
-      emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
+      _Offer storage offerIndex = allOffers[offerIdOfIndex];
+      if(offerIndex.OfferStatus == OfferStatus.available){
+        offerIndex.offerstatus = OfferStatus.cancelled;
+        userFunds[offerIndex.user] += offerIndex.price;
+        emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
+      } 
     }
   }
 
@@ -327,11 +329,12 @@ function simpleBuyNFT(uint _tokenId) public payable{
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
-      _Offer memory offerIndex = allOffers[offerIdOfIndex];
-      require(offerIndex.offerstatus == OfferStatus.available, 'Offer status should be available');
-      offerIndex.offerstatus = OfferStatus.cancelled;
-      userFunds[offerIndex.user] += offerIndex.price;
-      emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
+      _Offer storage offerIndex = allOffers[offerIdOfIndex];
+      if(offerIndex.OfferStatus == OfferStatus.available){
+        offerIndex.offerstatus = OfferStatus.cancelled;
+        userFunds[offerIndex.user] += offerIndex.price;
+        emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
+      }
     }
      //NFT原拥有者置为0地址
     tokenIdToOriginalAddress[_tokenId] = address(0);
@@ -350,11 +353,12 @@ reject the best price means cancel all the offer
     uint[] memory offerIdsOfTokenId = tokenIdToOfferIds[_tokenId];
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
-      _Offer memory offerIndex = allOffers[offerIdOfIndex];
-      require(offerIndex.offerstatus == OfferStatus.available, 'Offer status should be available');
-      offerIndex.offerstatus = OfferStatus.cancelled;
-      userFunds[offerIndex.user] += offerIndex.price;
-      emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
+      _Offer storage offerIndex = allOffers[offerIdOfIndex];
+      if(offerIndex.OfferStatus == OfferStatus.available){
+        offerIndex.offerstatus = OfferStatus.cancelled;
+        userFunds[offerIndex.user] += offerIndex.price;
+        emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
+      }
     }
      //NFT原拥有者置为0地址
     tokenIdToOriginalAddress[_tokenId] = address(0);
@@ -406,14 +410,16 @@ request ETH balance of owner
     uint256 balance =  userFunds[_owner];
     return balance;
  }
-/*
-request nftid of owner at index i
-用户 _owner 地址的第 index 个 NFT Id
-*/
-function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns (uint256) {
-    uint256 tokenId =  oneRingNFT.tokenOfOwnerByIndex(_owner, _index);
-    return tokenId;
-}
+
+// /*
+// request nftid of owner at index i
+// 用户 _owner 地址的第 index 个 NFT Id
+// */
+// function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns (uint256) {
+//     uint256 tokenId =  oneRingNFT.tokenOfOwnerByIndex(_owner, _index);
+//     return tokenId;
+// }
+
 /*
   request tokenURI of nftid
   NFT的元数据地址 通常为IPFS地址
@@ -425,22 +431,22 @@ function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns
 
 
 /*
- request best price of nftid
- 某NFT的当前最高Offer价格
+ request offer with best price of nftid
+ 某NFT的当前最高Offer
 */
   function bestOfferOfNFTId(uint _tokenId)public view returns(_Offer memory){
     uint  bestOfferId = tokenIdToBestOfferId[_tokenId];
     return allOffers[bestOfferId];
   }
 
-/*
- request all offers for nftid
- 返回NFT的所有OfferId
-*/
-  function offerIdsOfNFTId(uint _tokenId)public view returns(uint[] memory){
-    uint[] memory offerIdsOfId = tokenIdToOfferIds[_tokenId];
-    return offerIdsOfId;
-  }
+// /*
+//  request all offers for nftid
+//  返回NFT的所有OfferId
+// */
+//   function offerIdsOfNFTId(uint _tokenId)public view returns(uint[] memory){
+//     uint[] memory offerIdsOfId = tokenIdToOfferIds[_tokenId];
+//     return offerIdsOfId;
+//   }
 /*
   request offer detail of offer id
   返回特定Offer的细节数据
@@ -450,9 +456,8 @@ function tokenOfOwnerByIndex(address _owner, uint256 _index) public view returns
     return offer;
   }
 
-  // Fallback: reverts if Ether is sent to this smart-contract by mistake
   fallback () external payable{
-    //revert();
+    revert();
   }
   /*
   意外收到直接发送的ether到合约地址 将给相应用户增加存款余额

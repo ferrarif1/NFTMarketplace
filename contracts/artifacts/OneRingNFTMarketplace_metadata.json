@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.12+commit.f00d7308"
+		"version": "0.8.7+commit.e28d00a7"
 	},
 	"language": "Solidity",
 	"output": {
@@ -210,6 +210,45 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "allOffers",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "price",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum OneRingNFTMarketplace.OfferStatus",
+						"name": "offerstatus",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
 						"name": "_tokenId",
 						"type": "uint256"
 					}
@@ -358,6 +397,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "locked",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "uint256",
@@ -434,25 +486,6 @@
 						"internalType": "struct OneRingNFTMarketplace._Offer",
 						"name": "",
 						"type": "tuple"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "_tokenId",
-						"type": "uint256"
-					}
-				],
-				"name": "offerIdsOfNFTId",
-				"outputs": [
-					{
-						"internalType": "uint256[]",
-						"name": "",
-						"type": "uint256[]"
 					}
 				],
 				"stateMutability": "view",
@@ -545,17 +578,93 @@
 			{
 				"inputs": [
 					{
-						"internalType": "address",
-						"name": "_owner",
-						"type": "address"
-					},
-					{
 						"internalType": "uint256",
-						"name": "_index",
+						"name": "",
 						"type": "uint256"
 					}
 				],
-				"name": "tokenOfOwnerByIndex",
+				"name": "tokenIdToAuctionsType",
+				"outputs": [
+					{
+						"internalType": "enum OneRingNFTMarketplace.AuctionsType",
+						"name": "",
+						"type": "uint8"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "tokenIdToBestOfferId",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "tokenIdToOfferIds",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "tokenIdToOriginalAddress",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "tokenIdToStartPrice",
 				"outputs": [
 					{
 						"internalType": "uint256",
@@ -596,6 +705,25 @@
 				"name": "transferOwnership",
 				"outputs": [],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "userFunds",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -761,11 +889,11 @@
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0x99acc3e93d34f414707f4f2341976c36f22b4cf30e10789daf88b7451bcb83c1",
+			"keccak256": "0x19c83325acb51758f565f0983721aea0616b43f08cc482a4ebabfa206a5ea0ee",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://fb530d1f28e2bc5f4f42abd0ea5f97978b727f5c8e5f0b29a1c88658e62761f6",
-				"dweb:/ipfs/QmdpWWycmwDezVgXXpjqYyTj2LzY96wSJizJUFsaP3KkZh"
+				"bzz-raw://5182dff80482f3a407657e25ab7a1355877cad09634ddc7bf469d8d1220611b0",
+				"dweb:/ipfs/Qme9ksUg64A3jzEM2stckHCBoP5tyDQXwAD34CAuVgN4ff"
 			]
 		}
 	},

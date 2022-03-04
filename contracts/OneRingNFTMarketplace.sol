@@ -262,7 +262,7 @@ NFT由合约转给offer发起者，取消其他offer，相应用户余额增加
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer storage offerIndex = allOffers[offerIdOfIndex];
       if(offerIndex.offerId != _offerId){
-        if(offerIndex.OfferStatus == OfferStatus.available){
+        if(offerIndex.offerstatus == OfferStatus.available){
           offerIndex.offerstatus = OfferStatus.cancelled;
           userFunds[offerIndex.user] += offerIndex.price;
           emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
@@ -285,7 +285,7 @@ only cancel, still on sale(NFT hold by contract)
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer storage offerIndex = allOffers[offerIdOfIndex];
-      if(offerIndex.OfferStatus == OfferStatus.available){
+      if(offerIndex.offerstatus == OfferStatus.available){
         offerIndex.offerstatus = OfferStatus.cancelled;
         userFunds[offerIndex.user] += offerIndex.price;
         emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
@@ -330,7 +330,7 @@ function simpleBuyNFT(uint _tokenId) public payable{
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer storage offerIndex = allOffers[offerIdOfIndex];
-      if(offerIndex.OfferStatus == OfferStatus.available){
+      if(offerIndex.offerstatus == OfferStatus.available){
         offerIndex.offerstatus = OfferStatus.cancelled;
         userFunds[offerIndex.user] += offerIndex.price;
         emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);
@@ -354,7 +354,7 @@ reject the best price means cancel all the offer
     for(uint index = 0; index < offerIdsOfTokenId.length; index++){
       uint offerIdOfIndex = offerIdsOfTokenId[index];
       _Offer storage offerIndex = allOffers[offerIdOfIndex];
-      if(offerIndex.OfferStatus == OfferStatus.available){
+      if(offerIndex.offerstatus == OfferStatus.available){
         offerIndex.offerstatus = OfferStatus.cancelled;
         userFunds[offerIndex.user] += offerIndex.price;
         emit OfferCancelled(offerIndex.offerId, offerIndex.tokenId, offerIndex.user);

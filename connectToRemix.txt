@@ -1,0 +1,1 @@
+remixd -s /Library/WebServer/Documents/NFTMarketplace -u https://remix.ethereum.org

@@ -126,6 +126,7 @@ function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public o
   decrease price for AuctionsType.Netherlands
   荷兰拍卖模式下 NFT拥有者主动降低价格
   offer价格不断升高 NFT拥有者价格主动降低 直到达成一致
+  主动降低的价格如果低于最佳offer价格没有意义 不如直接接受最佳offer 故认为降低的价格只需小于之前的startPrice
 */
   function decreasePriceForNetherlandsAuctionsType(uint _tokenId,  uint _price) public onlyOriginalOwnerOf(_tokenId){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];

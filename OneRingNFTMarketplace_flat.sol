@@ -1449,14 +1449,14 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
     return super.supportsInterface(interfaceId);
   }
-  /*
-  获取tokenURI
-  @tokenId NFT的id
-  */
-  function tokenURI(uint256 tokenId) public override view returns (string memory) {
-    require(_exists(tokenId), 'ERC721Metadata: URI query for nonexistent token');
-    return _tokenIdToTokenURI[tokenId];
-  }
+  // /*
+  // 获取tokenURI
+  // @tokenId NFT的id
+  // */
+  // function tokenURI(uint256 tokenId) public override view returns (string memory) {
+  //   require(_exists(tokenId), 'ERC721Metadata: URI query for nonexistent token');
+  //   return _tokenIdToTokenURI[tokenId];
+  // }
 
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);
@@ -1520,6 +1520,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
 
 
 pragma solidity ^0.8.0;
+
 
 
 
@@ -1633,7 +1634,10 @@ function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public o
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
      require(_auctionsType == AuctionsType.England);
      uint bestOfferId = tokenIdToBestOfferId[_tokenId];
-     require(bestOfferId == 0, "Can not change start price when you already have offers!");
+     _Offer memory bestOffer = allOffers[bestOfferId];
+     if(bestOffer.offerId > 0){
+       require(bestOffer.offerstatus != OfferStatus.available, "Can not change start price when you already have available offers!");
+     }
      tokenIdToStartPrice[_tokenId] = _price;
   }
 /*
@@ -1644,7 +1648,7 @@ function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public o
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
      require(_auctionsType == AuctionsType.Netherlands,"AuctionsType should be Netherlands");
      uint  _currentStartPrice = tokenIdToStartPrice[_tokenId];
-     require(_price <= _currentStartPrice, 'The new price should be lesser than current best price given by owner of nft');
+     require(_price <= _currentStartPrice, "The new price should be lesser than current best price given by owner of nft");
      tokenIdToStartPrice[_tokenId] = _price;
   }
   /*
@@ -1670,10 +1674,12 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     //如果没有offer，当前最佳价格为0
     uint  _currentBestPrice = 0;
     uint currentBestOfferId = tokenIdToBestOfferId[_tokenId];
-    //如果有offer，更新为最佳offer价格
+    //如果有offer,且offer是有效状态，更新为最佳offer价格
     if(currentBestOfferId > 0){
        _Offer memory currentBestOffer = allOffers[currentBestOfferId];
-       _currentBestPrice = currentBestOffer.price;
+       if(currentBestOffer.offerstatus == OfferStatus.available){
+          _currentBestPrice = currentBestOffer.price;
+       }
     }
     //根据拍卖模式判断价格是否合法
     uint startPrice = tokenIdToStartPrice[_tokenId];
@@ -1719,9 +1725,12 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     //如果没有offer，当前最佳价格为0
     uint  _currentBestPrice = 0;
     uint currentBestOfferId = tokenIdToBestOfferId[_tokenId];
-    if(currentBestOfferId > 0){//如果有offer，更新为最佳offer价格
+    //如果有offer,且offer是有效状态，更新为最佳offer价格
+    if(currentBestOfferId > 0){
        _Offer memory currentBestOffer = allOffers[currentBestOfferId];
-       _currentBestPrice = currentBestOffer.price;
+       if(currentBestOffer.offerstatus == OfferStatus.available){
+          _currentBestPrice = currentBestOffer.price;
+       }
     }
     uint startPrice = tokenIdToStartPrice[_tokenId];
     AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
@@ -1951,11 +1960,18 @@ request ETH balance of owner
 
 /*
  request offer with best price of nftid
- 某NFT的当前最高Offer
+ 某NFT的当前最高且有效的Offer
 */
   function bestOfferOfNFTId(uint _tokenId)public view returns(_Offer memory){
     uint  bestOfferId = tokenIdToBestOfferId[_tokenId];
-    return allOffers[bestOfferId];
+    _Offer memory bestOffer = allOffers[bestOfferId];
+    if(bestOffer.offerstatus == OfferStatus.available){
+        return bestOffer;
+    }else{
+        _Offer memory newOffer = _Offer(0, 0, address(0), 0, OfferStatus.cancelled);
+        return newOffer;
+    }
+    
   }
 
 // /*

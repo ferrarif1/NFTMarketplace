@@ -455,7 +455,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"OneRingNFT_flat.sol": "ERC721Enumerable"
+			"OneRingNFTMarketplace_flat.sol": "ERC721Enumerable"
 		},
 		"evmVersion": "london",
 		"libraries": {},
@@ -469,12 +469,11 @@
 		"remappings": []
 	},
 	"sources": {
-		"OneRingNFT_flat.sol": {
-			"keccak256": "0xe39d1d735984d20f7969e4f0a2f0b0d0e4adf21fb4171bf1147a4dd0acbb0381",
-			"license": "UNLICENSED",
+		"OneRingNFTMarketplace_flat.sol": {
+			"keccak256": "0x053e44bbdb845157b29823154441f843ff58bddc4e104ea7f125ea67450060f4",
 			"urls": [
-				"bzz-raw://a2a7b7dba74fe4f366fcb3e60168ac69cc7647e9136519bb0c73ce95a543438f",
-				"dweb:/ipfs/QmV1XwvUNJhYsiqNLDteV7HdmVpx5NNRAcoMesj6459LNx"
+				"bzz-raw://f98fdda49d818fe83effbb2def9f543caff13e4e555d48aaac7cfd7c1d08d503",
+				"dweb:/ipfs/QmdD4E4J9bp6VBfsS2ki89sPnPwajnLyZHmqGpWYkHKJnC"
 			]
 		}
 	},

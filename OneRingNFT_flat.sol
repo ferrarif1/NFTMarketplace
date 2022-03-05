@@ -1371,14 +1371,14 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
     return super.supportsInterface(interfaceId);
   }
-  /*
-  获取tokenURI
-  @tokenId NFT的id
-  */
-  function tokenURI(uint256 tokenId) public override view returns (string memory) {
-    require(_exists(tokenId), 'ERC721Metadata: URI query for nonexistent token');
-    return _tokenIdToTokenURI[tokenId];
-  }
+  // /*
+  // 获取tokenURI
+  // @tokenId NFT的id
+  // */
+  // function tokenURI(uint256 tokenId) public override view returns (string memory) {
+  //   require(_exists(tokenId), 'ERC721Metadata: URI query for nonexistent token');
+  //   return _tokenIdToTokenURI[tokenId];
+  // }
 
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);

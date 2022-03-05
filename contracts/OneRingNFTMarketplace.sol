@@ -110,6 +110,7 @@ contract OneRingNFTMarketplace is Ownable {
   /************************************************************************ 修改起始价格 ***************************************************************/
 /*
   英格兰模式下 修改起拍价格
+  Offer价格不断升高 这里限制一旦有了offer 不能修改startPrice
 */
 function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public onlyOriginalOwnerOf(_tokenId){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
@@ -124,6 +125,7 @@ function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public o
 /*
   decrease price for AuctionsType.Netherlands
   荷兰拍卖模式下 NFT拥有者主动降低价格
+  offer价格不断升高 NFT拥有者价格主动降低 直到达成一致
 */
   function decreasePriceForNetherlandsAuctionsType(uint _tokenId,  uint _price) public onlyOriginalOwnerOf(_tokenId){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
@@ -135,6 +137,7 @@ function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public o
   /*
    change price for AuctionsType.Simple
    简单拍卖模式下，NFT拥有者修改价格
+   拥有者可任意修改价格
   */
 function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public onlyOriginalOwnerOf(_tokenId){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
@@ -146,6 +149,8 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
 /*
   give offer 1, send eth to contract
   使用ether支付，给出竞拍某NFT的Offer
+  price的单位是Wei msg.value是实际付款的金额
+  多余的付款金额将自动加入余额
   *** 新offer必为bestOffer ***
 */
   function makeOffer(uint _tokenId, uint _price) public payable{
@@ -196,7 +201,9 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
 
 /*
   give offer 2, pay with funds and eth
-  组合支付使用用户存在合约的余额+ether支付，给出竞拍某NFT的Offer
+  组合支付使用用户存在合约的余额+ether支付，给出竞拍某NFT的Offer 优先扣除用户转账的ether
+  price的单位是Wei msg.value是实际付款的金额
+  多余的付款金额将自动加入余额
   *** 新offer必为bestOffer ***
 */
   function makeOfferWithUserFundsAndEther(uint _tokenId, uint _price) public payable{

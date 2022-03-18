@@ -2,12 +2,15 @@
 
 pragma solidity >=0.7.0 <0.9.0;
 
-contract NFTOracle  {
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+
+contract NFTOracle is Ownable{
    
    //预言机合约部署
-   address owner;//AI检测地址
+
    constructor ()  {
-       owner = msg.sender;
+
    }
 
    //NFT
@@ -20,7 +23,7 @@ contract NFTOracle  {
        bool result; //检测结果
        address uploader;// 送检者
    }
-   uint public ID = 0;//检测系统中所有NFT编号
+   uint public ID = 1;//检测系统中所有NFT编号
    mapping(uint=>NFT) private nfts; 
    
    //输入NFT哈希，查看其是否通过检测(可供用户调用)
@@ -33,8 +36,8 @@ contract NFTOracle  {
         return false;
    }
    //输入NFT编号，查看送检情况（供检测者调用）
-   function checkNFTByID(uint _ID) public view returns(bool) {
-       require(msg.sender == owner,"Only owner can check the NFT by ID!");
+   function checkNFTByID(uint _ID) public view returns(bool){
+    //    require(msg.sender == owner,"Only owner can check the NFT by ID!");
        require(_ID<ID,"This ID of NFT don't exists");
        NFT memory nft = nfts[_ID];
        return nft.result;
@@ -49,13 +52,13 @@ contract NFTOracle  {
        nfts[ID].isDetected = false;
        nfts[ID].result = false;
        nfts[ID].uploader = msg.sender;
-       ID++;
-       return ID;
+       ID = ID+1;
+       return ID-1;
    }
 
     //NFT检测情况更新
-    function detectNFT(uint _ID,bool _result) public {
-        require(msg.sender == owner,"Only owner can detect the NFT!");
+    function detectNFT(uint _ID,bool _result) public onlyOwner{
+        // require(msg.sender == owner,"Only owner can detect the NFT!");
         require(nfts[_ID].isDetected==false&&nfts[_ID].state==NFTState.Undetected,"The NFT does not meet the detection conditions!");
         nfts[_ID].result = _result;
         nfts[ID].isDetected = false;

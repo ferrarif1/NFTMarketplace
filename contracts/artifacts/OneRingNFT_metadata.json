@@ -833,19 +833,19 @@
 			]
 		},
 		"contracts/OneRingNFT.sol": {
-			"keccak256": "0x3de40b256b4fab40ca7754ea3fcc604c33cc65287158cb30ab8c9583f29bfd35",
+			"keccak256": "0xae796045bc8ab025c15da9efe7955ef7c188af601b29454097b65059987ce143",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://7160c1b6c57e2826ffef36392a19e5d3e72f4a092ad6172c61fcfa7dce0aaeea",
-				"dweb:/ipfs/QmVkdaq3PXCo7a7rRm8kUjDAsXBzs4syrYmnPw1LqvV9RB"
+				"bzz-raw://b3559226c0c88600d114af7e86289073ba1da5c1d8a103522b44d2c92c8e7a49",
+				"dweb:/ipfs/QmT9wAuuDT8dJr5E2BFomm4KDehciubQbLydN1aGg1dLdR"
 			]
 		},
 		"contracts/oracle.sol": {
-			"keccak256": "0x5e49efaeeadc23a6b6e18a24f01c41f8351ad089e735b314c7e9027cea94682d",
+			"keccak256": "0x22c8b8d0f4c75f90c3f0fe526c40fac8496c252c43fc4aa91610e8da2931a85e",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://20a02be5b53da47d888f50357c9e81085319af1d7d7198a4a406067d1ef174dc",
-				"dweb:/ipfs/QmdyAPYegtALn7mwxjvPGsG1TSJfoxUiL3sEYN3NLCYW8f"
+				"bzz-raw://082336c0a692caa0ea771bf96b12443cfe8a325fb0732570458bf9f955137f70",
+				"dweb:/ipfs/QmQibe9BWpfgEFspav4AVNGQ8am7cxg8z4LdzgjYwoNk9k"
 			]
 		}
 	},

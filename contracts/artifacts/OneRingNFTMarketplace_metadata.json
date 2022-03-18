@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.12+commit.f00d7308"
+		"version": "0.8.7+commit.e28d00a7"
 	},
 	"language": "Solidity",
 	"output": {
@@ -889,11 +889,11 @@
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0x4637323d2a07174517fb288f7d527eaeceaa0895180dc261bcdc364301b22efe",
+			"keccak256": "0x8efe02fd451bcc7183225da7fc9ac6f0312e304e22ad9bda0fa66ae838d50536",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://aa9e9cfecd52b376bf2d6c0ced5188d551ef30c3e878c263bc7e30eb8ff496d3",
-				"dweb:/ipfs/QmeqwgQhrh28VZ8VSMw7et63VSdyjrxb2mHzKCsaGzBrnK"
+				"bzz-raw://8ea3b9c7313ff12c1d650d941393293bfd4e1e3d90d598d22e3d4b196710ce75",
+				"dweb:/ipfs/QmaPU5mnvYLHiFJT1CG77S5ywMNWxU7tNQiJCAQ8ASbEMu"
 			]
 		}
 	},

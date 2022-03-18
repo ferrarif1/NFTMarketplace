@@ -4,17 +4,42 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "./oracle.sol";
 
-contract OneRingNFT is ERC721, ERC721Enumerable {
+contract OneRingNFT is ERC721, ERC721Enumerable, Ownable{
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
   string[] public tokenURIs;
+  address oracleAddr;
   mapping(string => bool)public _tokenURIExists;
   mapping(uint => string)public _tokenIdToTokenURI;
   mapping(uint => string)public _tokenIdToCollectionName;
   mapping(string => address)private _collectionNameToCollectionOwner;
+  ////oracle 0 data
+  mapping(string => uint256)public _tokenURLToNFT_ID_IN_Oracle;
 
   constructor() ERC721("One Ring Collection", "ORC") {}
+ ////oracle 3 check result
+  modifier tokenUrlPassed(string memory _tokenURI){ 
+     require(oracleAddr != address(0),"please set oracle first!");
+     NFTOracle oracle = NFTOracle(oracleAddr);
+     uint256 NFTid = _tokenURLToNFT_ID_IN_Oracle[_tokenURI];
+     bool result = oracle.checkNFTByID(NFTid);
+     require(result == true);
+     _;
+  }
+  //oracle 1 setup
+  function setOracleAddress(address oracleaddr)public onlyOwner{
+     oracleAddr = oracleaddr;
+  }
+  //oracle 2 upload
+  function checkTokenURLBeforeMint(string memory tokenHash, string memory _tokenURI) public{
+     require(oracleAddr != address(0),"please set oracle first!");
+     NFTOracle oracle = NFTOracle(oracleAddr);
+     uint256 NFT_ID_IN_Oracle = oracle.uploadNFT(tokenHash, _tokenURI);
+     _tokenURLToNFT_ID_IN_Oracle[_tokenURI] = NFT_ID_IN_Oracle;
+  }
 
   function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
     super._beforeTokenTransfer(from, to, tokenId);
@@ -23,14 +48,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
     return super.supportsInterface(interfaceId);
   }
-  // /*
-  // 获取tokenURI
-  // @tokenId NFT的id
-  // */
-  // function tokenURI(uint256 tokenId) public override view returns (string memory) {
-  //   require(_exists(tokenId), 'ERC721Metadata: URI query for nonexistent token');
-  //   return _tokenIdToTokenURI[tokenId];
-  // }
+ 
 
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);
@@ -39,7 +57,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   铸造NFT 
   @_tokenURI 传入ipfs地址作为tokenURL
   */
-  function safeMint(string memory _tokenURI) public {
+  function safeMint(string memory _tokenURI) public tokenUrlPassed(_tokenURI){
     require(!_tokenURIExists[_tokenURI], 'The token URI should be unique');
     tokenURIs.push(_tokenURI);    
     _tokenIds.increment();

@@ -885,11 +885,11 @@
 			]
 		},
 		"contracts/oracle.sol": {
-			"keccak256": "0x22c8b8d0f4c75f90c3f0fe526c40fac8496c252c43fc4aa91610e8da2931a85e",
+			"keccak256": "0xb54f28313f4be0ba1b36b8f9c2cb971a96b56faf7040db6f6bae39eb72907a05",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://082336c0a692caa0ea771bf96b12443cfe8a325fb0732570458bf9f955137f70",
-				"dweb:/ipfs/QmQibe9BWpfgEFspav4AVNGQ8am7cxg8z4LdzgjYwoNk9k"
+				"bzz-raw://cab41231e3350934152921c780a1b068badcbd59e514e7d4508fd56c57c816db",
+				"dweb:/ipfs/QmPSALBvtGKyn6SJ2HzXbk5q91XQhsXpVcpngRxkPttfGG"
 			]
 		}
 	},

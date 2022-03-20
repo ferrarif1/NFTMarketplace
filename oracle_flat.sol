@@ -142,12 +142,19 @@ contract NFTOracle is Ownable{
         }
         return false;
    }
-   //输入NFT编号，查看送检情况（供检测者调用）
+   //输入NFT编号，查看送检情况（供检测者调用）1 返回检测结果
    function checkNFTByID(uint _ID) public view returns(bool){
     //    require(msg.sender == owner,"Only owner can check the NFT by ID!");
        require(_ID<ID,"This ID of NFT don't exists");
        NFT memory nft = nfts[_ID];
        return nft.result;
+   }
+    //输入NFT编号，查看送检情况（供检测者调用）2 返回NFT详情
+   function checkNFTByIDDetail(uint _ID) public view returns(NFT memory){
+    //    require(msg.sender == owner,"Only owner can check the NFT by ID!");
+       require(_ID<ID,"This ID of NFT don't exists");
+       NFT memory nft = nfts[_ID];
+       return nft;
    }
    
    //NFT送检

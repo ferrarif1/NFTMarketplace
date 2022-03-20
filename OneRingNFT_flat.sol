@@ -96,6 +96,177 @@ abstract contract Context {
     }
 }
 
+// File: @openzeppelin/contracts/access/Ownable.sol
+
+
+// OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
+
+pragma solidity ^0.8.0;
+
+
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * By default, the owner account will be the one that deploys the contract. This
+ * can later be changed with {transferOwnership}.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+abstract contract Ownable is Context {
+    address private _owner;
+
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    constructor() {
+        _transferOwnership(_msgSender());
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Internal function without access restriction.
+     */
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+}
+
+// File: contracts/oracle.sol
+
+
+
+pragma solidity >=0.7.0 <0.9.0;
+
+
+
+contract NFTOracle is Ownable{
+   
+   //预言机合约部署
+
+   constructor ()  {
+
+   }
+
+   //NFT
+   enum NFTState {Undetected,Detected}
+   struct NFT{
+       NFTState state;//目前的状态
+       string hash;//NFT哈希值
+       string IPFS; //NFT的IPFS
+       bool isDetected; // 是否经过检测
+       bool result; //检测结果
+       address uploader;// 送检者
+   }
+   uint public ID = 1;//检测系统中所有NFT编号
+   mapping(uint=>NFT) private nfts; 
+   
+   //输入NFT哈希，查看其是否通过检测(可供用户调用)
+   function checkNFTByHash(string memory _hash) public view returns(bool) {
+       for(uint i=0;i<ID;i++){
+            if(compareStrings(nfts[i].hash,_hash)&&nfts[i].result==true){
+                return true;
+            }
+        }
+        return false;
+   }
+   //输入NFT编号，查看送检情况（供检测者调用）
+   function checkNFTByID(uint _ID) public view returns(bool){
+    //    require(msg.sender == owner,"Only owner can check the NFT by ID!");
+       require(_ID<ID,"This ID of NFT don't exists");
+       NFT memory nft = nfts[_ID];
+       return nft.result;
+   }
+   
+   //NFT送检
+   function uploadNFT(string memory _hash,string memory _ipfs)  public returns(uint256){
+       require(hashIsExists(_hash)&&ipfsIsExists(_ipfs),"Unable to repeat the detection!");
+       nfts[ID].hash = _hash;
+       nfts[ID].IPFS = _ipfs;
+       nfts[ID].state = NFTState.Undetected; 
+       nfts[ID].isDetected = false;
+       nfts[ID].result = false;
+       nfts[ID].uploader = msg.sender;
+       ID = ID+1;
+       return ID-1;
+   }
+
+    //NFT检测情况更新
+    function detectNFT(uint _ID,bool _result) public onlyOwner{
+        // require(msg.sender == owner,"Only owner can detect the NFT!");
+        require(nfts[_ID].isDetected==false&&nfts[_ID].state==NFTState.Undetected,"The NFT does not meet the detection conditions!");
+        nfts[_ID].result = _result;
+        nfts[ID].isDetected = false;
+        nfts[ID].state = NFTState.Detected;
+   }
+   
+   //判断该NFT是否满足检测条件，即该NFT是否已经送检过
+    function  hashIsExists(string memory _hash) private view returns(bool){
+        for(uint i=0;i<ID;i++){
+            if(compareStrings(nfts[i].hash,_hash)){
+                return false;
+            }
+        }
+        return true;
+    }
+    function ipfsIsExists(string memory _ipfs) private view returns(bool){
+        for(uint i=0;i<ID;i++){
+            if(compareStrings(nfts[i].IPFS,_ipfs)){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    function  compareStrings(string memory a, string memory b) private pure returns(bool) {
+           return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+
+
+
+}
 // File: @openzeppelin/contracts/utils/Address.sol
 
 
@@ -1353,16 +1524,42 @@ pragma solidity ^0.8.0;
 
 
 
-contract OneRingNFT is ERC721, ERC721Enumerable {
+
+
+contract OneRingNFT is ERC721, ERC721Enumerable, Ownable{
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
   string[] public tokenURIs;
+  address oracleAddr;
   mapping(string => bool)public _tokenURIExists;
   mapping(uint => string)public _tokenIdToTokenURI;
   mapping(uint => string)public _tokenIdToCollectionName;
   mapping(string => address)private _collectionNameToCollectionOwner;
+  ////oracle 0 data
+  mapping(string => uint256)public _tokenURLToNFT_ID_IN_Oracle;
 
   constructor() ERC721("One Ring Collection", "ORC") {}
+ ////oracle 3 check result
+  modifier tokenUrlPassed(string memory _tokenURI){ 
+     require(oracleAddr != address(0),"please set oracle first!");
+     NFTOracle oracle = NFTOracle(oracleAddr);
+     uint256 NFTid = _tokenURLToNFT_ID_IN_Oracle[_tokenURI];
+     bool result = false;
+     result = oracle.checkNFTByID(NFTid);
+     require(result == true, "oracle did not passed!");
+     _;
+  }
+  //oracle 1 setup
+  function setOracleAddress(address oracleaddr)public onlyOwner{
+     oracleAddr = oracleaddr;
+  }
+  //oracle 2 upload
+  function checkTokenURLBeforeMint(string memory tokenHash, string memory _tokenURI) public{
+     require(oracleAddr != address(0),"please set oracle first!");
+     NFTOracle oracle = NFTOracle(oracleAddr);
+     uint256 NFT_ID_IN_Oracle = oracle.uploadNFT(tokenHash, _tokenURI);
+     _tokenURLToNFT_ID_IN_Oracle[_tokenURI] = NFT_ID_IN_Oracle;
+  }
 
   function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
     super._beforeTokenTransfer(from, to, tokenId);
@@ -1371,14 +1568,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
     return super.supportsInterface(interfaceId);
   }
-  // /*
-  // 获取tokenURI
-  // @tokenId NFT的id
-  // */
-  // function tokenURI(uint256 tokenId) public override view returns (string memory) {
-  //   require(_exists(tokenId), 'ERC721Metadata: URI query for nonexistent token');
-  //   return _tokenIdToTokenURI[tokenId];
-  // }
+ 
 
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);
@@ -1387,7 +1577,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   铸造NFT 
   @_tokenURI 传入ipfs地址作为tokenURL
   */
-  function safeMint(string memory _tokenURI) public {
+  function safeMint(string memory _tokenURI) public tokenUrlPassed(_tokenURI){
     require(!_tokenURIExists[_tokenURI], 'The token URI should be unique');
     tokenURIs.push(_tokenURI);    
     _tokenIds.increment();
@@ -1396,7 +1586,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     _safeMint(msg.sender, newItemId);
     _tokenURIExists[_tokenURI] = true;
   }
-  
+  /*             NFT加入到Collection              */
   /*
   NFT加入到Collection 
   @tokenId NFT的id

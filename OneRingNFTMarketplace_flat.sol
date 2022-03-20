@@ -174,6 +174,99 @@ abstract contract Ownable is Context {
     }
 }
 
+// File: contracts/oracle.sol
+
+
+
+pragma solidity >=0.7.0 <0.9.0;
+
+
+
+contract NFTOracle is Ownable{
+   
+   //预言机合约部署
+
+   constructor ()  {
+
+   }
+
+   //NFT
+   enum NFTState {Undetected,Detected}
+   struct NFT{
+       NFTState state;//目前的状态
+       string hash;//NFT哈希值
+       string IPFS; //NFT的IPFS
+       bool isDetected; // 是否经过检测
+       bool result; //检测结果
+       address uploader;// 送检者
+   }
+   uint public ID = 1;//检测系统中所有NFT编号
+   mapping(uint=>NFT) private nfts; 
+   
+   //输入NFT哈希，查看其是否通过检测(可供用户调用)
+   function checkNFTByHash(string memory _hash) public view returns(bool) {
+       for(uint i=0;i<ID;i++){
+            if(compareStrings(nfts[i].hash,_hash)&&nfts[i].result==true){
+                return true;
+            }
+        }
+        return false;
+   }
+   //输入NFT编号，查看送检情况（供检测者调用）
+   function checkNFTByID(uint _ID) public view returns(bool){
+    //    require(msg.sender == owner,"Only owner can check the NFT by ID!");
+       require(_ID<ID,"This ID of NFT don't exists");
+       NFT memory nft = nfts[_ID];
+       return nft.result;
+   }
+   
+   //NFT送检
+   function uploadNFT(string memory _hash,string memory _ipfs)  public returns(uint256){
+       require(hashIsExists(_hash)&&ipfsIsExists(_ipfs),"Unable to repeat the detection!");
+       nfts[ID].hash = _hash;
+       nfts[ID].IPFS = _ipfs;
+       nfts[ID].state = NFTState.Undetected; 
+       nfts[ID].isDetected = false;
+       nfts[ID].result = false;
+       nfts[ID].uploader = msg.sender;
+       ID = ID+1;
+       return ID-1;
+   }
+
+    //NFT检测情况更新
+    function detectNFT(uint _ID,bool _result) public onlyOwner{
+        // require(msg.sender == owner,"Only owner can detect the NFT!");
+        require(nfts[_ID].isDetected==false&&nfts[_ID].state==NFTState.Undetected,"The NFT does not meet the detection conditions!");
+        nfts[_ID].result = _result;
+        nfts[ID].isDetected = false;
+        nfts[ID].state = NFTState.Detected;
+   }
+   
+   //判断该NFT是否满足检测条件，即该NFT是否已经送检过
+    function  hashIsExists(string memory _hash) private view returns(bool){
+        for(uint i=0;i<ID;i++){
+            if(compareStrings(nfts[i].hash,_hash)){
+                return false;
+            }
+        }
+        return true;
+    }
+    function ipfsIsExists(string memory _ipfs) private view returns(bool){
+        for(uint i=0;i<ID;i++){
+            if(compareStrings(nfts[i].IPFS,_ipfs)){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    function  compareStrings(string memory a, string memory b) private pure returns(bool) {
+           return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+
+
+
+}
 // File: @openzeppelin/contracts/utils/Address.sol
 
 
@@ -1431,16 +1524,42 @@ pragma solidity ^0.8.0;
 
 
 
-contract OneRingNFT is ERC721, ERC721Enumerable {
+
+
+contract OneRingNFT is ERC721, ERC721Enumerable, Ownable{
   using Counters for Counters.Counter;
   Counters.Counter private _tokenIds;
   string[] public tokenURIs;
+  address oracleAddr;
   mapping(string => bool)public _tokenURIExists;
   mapping(uint => string)public _tokenIdToTokenURI;
   mapping(uint => string)public _tokenIdToCollectionName;
   mapping(string => address)private _collectionNameToCollectionOwner;
+  ////oracle 0 data
+  mapping(string => uint256)public _tokenURLToNFT_ID_IN_Oracle;
 
   constructor() ERC721("One Ring Collection", "ORC") {}
+ ////oracle 3 check result
+  modifier tokenUrlPassed(string memory _tokenURI){ 
+     require(oracleAddr != address(0),"please set oracle first!");
+     NFTOracle oracle = NFTOracle(oracleAddr);
+     uint256 NFTid = _tokenURLToNFT_ID_IN_Oracle[_tokenURI];
+     bool result = false;
+     result = oracle.checkNFTByID(NFTid);
+     require(result == true, "oracle did not passed!");
+     _;
+  }
+  //oracle 1 setup
+  function setOracleAddress(address oracleaddr)public onlyOwner{
+     oracleAddr = oracleaddr;
+  }
+  //oracle 2 upload
+  function checkTokenURLBeforeMint(string memory tokenHash, string memory _tokenURI) public{
+     require(oracleAddr != address(0),"please set oracle first!");
+     NFTOracle oracle = NFTOracle(oracleAddr);
+     uint256 NFT_ID_IN_Oracle = oracle.uploadNFT(tokenHash, _tokenURI);
+     _tokenURLToNFT_ID_IN_Oracle[_tokenURI] = NFT_ID_IN_Oracle;
+  }
 
   function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
     super._beforeTokenTransfer(from, to, tokenId);
@@ -1449,14 +1568,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   function supportsInterface(bytes4 interfaceId) public view override(ERC721, ERC721Enumerable) returns (bool) {
     return super.supportsInterface(interfaceId);
   }
-  // /*
-  // 获取tokenURI
-  // @tokenId NFT的id
-  // */
-  // function tokenURI(uint256 tokenId) public override view returns (string memory) {
-  //   require(_exists(tokenId), 'ERC721Metadata: URI query for nonexistent token');
-  //   return _tokenIdToTokenURI[tokenId];
-  // }
+ 
 
   function tokenOfOwnerByIndex(address owner, uint256 index) public view virtual override returns (uint256) {
      return super.tokenOfOwnerByIndex(owner, index);
@@ -1465,7 +1577,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
   铸造NFT 
   @_tokenURI 传入ipfs地址作为tokenURL
   */
-  function safeMint(string memory _tokenURI) public {
+  function safeMint(string memory _tokenURI) public tokenUrlPassed(_tokenURI){
     require(!_tokenURIExists[_tokenURI], 'The token URI should be unique');
     tokenURIs.push(_tokenURI);    
     _tokenIds.increment();
@@ -1474,7 +1586,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable {
     _safeMint(msg.sender, newItemId);
     _tokenURIExists[_tokenURI] = true;
   }
-  
+  /*             NFT加入到Collection              */
   /*
   NFT加入到Collection 
   @tokenId NFT的id
@@ -1564,10 +1676,11 @@ contract OneRingNFTMarketplace is Ownable {
   /*
   event事件 用于链上行为的通知
   */
-  event Offer( uint offerId, uint tokenId, address user, uint price, OfferStatus offerstatus);
-  event OfferFilled(uint offerId, uint tokenId, address newOwner);
-  event OfferCancelled(uint offerId, uint tokenId, address owner);
-  event ClaimFunds(address user, uint amount);
+  //fromuUer、newOwner、offerOwner都是offer的发起者
+  event OfferCreated( uint indexed offerId, uint indexed tokenId, address indexed fromuUer);
+  event OfferFilled(uint indexed offerId, uint indexed tokenId, address indexed newOwner);
+  event OfferCancelled(uint indexed offerId, uint indexed tokenId, address indexed offerOwner);
+  event ClaimFunds(address indexed user, uint indexed amount);
 
   //OneRingNFT合约的实例，用于调用相关铸造、转账等函数
   OneRingNFT oneRingNFT;
@@ -1629,6 +1742,7 @@ contract OneRingNFTMarketplace is Ownable {
   /************************************************************************ 修改起始价格 ***************************************************************/
 /*
   英格兰模式下 修改起拍价格
+  Offer价格不断升高 这里限制一旦有了offer 不能修改startPrice
 */
 function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public onlyOriginalOwnerOf(_tokenId){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
@@ -1643,6 +1757,8 @@ function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public o
 /*
   decrease price for AuctionsType.Netherlands
   荷兰拍卖模式下 NFT拥有者主动降低价格
+  offer价格不断升高 NFT拥有者价格主动降低 直到达成一致
+  主动降低的价格如果低于最佳offer价格没有意义 不如直接接受最佳offer 故认为降低的价格只需小于之前的startPrice
 */
   function decreasePriceForNetherlandsAuctionsType(uint _tokenId,  uint _price) public onlyOriginalOwnerOf(_tokenId){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
@@ -1654,6 +1770,7 @@ function changePriceForEnglandAuctionsType(uint _tokenId,  uint _price) public o
   /*
    change price for AuctionsType.Simple
    简单拍卖模式下，NFT拥有者修改价格
+   拥有者可任意修改价格
   */
 function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public onlyOriginalOwnerOf(_tokenId){
      AuctionsType _auctionsType = tokenIdToAuctionsType[_tokenId];
@@ -1665,6 +1782,8 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
 /*
   give offer 1, send eth to contract
   使用ether支付，给出竞拍某NFT的Offer
+  price的单位是Wei msg.value是实际付款的金额
+  多余的付款金额将自动加入余额
   *** 新offer必为bestOffer ***
 */
   function makeOffer(uint _tokenId, uint _price) public payable{
@@ -1710,12 +1829,14 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     //更新最佳Offer id
     tokenIdToBestOfferId[_tokenId] = newOfferId;
     //4.emit event
-    emit Offer(newOfferId, _tokenId, msg.sender, _price, OfferStatus.available);
+    emit OfferCreated(newOfferId, _tokenId, msg.sender);
   }
 
 /*
   give offer 2, pay with funds and eth
-  组合支付使用用户存在合约的余额+ether支付，给出竞拍某NFT的Offer
+  组合支付使用用户存在合约的余额+ether支付，给出竞拍某NFT的Offer 优先扣除用户转账的ether
+  price的单位是Wei msg.value是实际付款的金额
+  多余的付款金额将自动加入余额
   *** 新offer必为bestOffer ***
 */
   function makeOfferWithUserFundsAndEther(uint _tokenId, uint _price) public payable{
@@ -1763,7 +1884,7 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     //更新最佳Offer id
     tokenIdToBestOfferId[_tokenId] = newOfferId;
     //4.emit event
-    emit Offer(newOfferId, _tokenId, msg.sender, _price, OfferStatus.available);
+    emit OfferCreated(newOfferId, _tokenId, msg.sender);
   }
 /************************************************************************ 接受他人/拒绝他人/取消自己 Offer ***************************************************************/
 /*
@@ -1833,7 +1954,7 @@ cancel one's own Offer
     require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
     currentOffer.offerstatus = OfferStatus.cancelled;
     userFunds[currentOffer.user] += currentOffer.price;
-    emit OfferCancelled(_offerId, currentOffer.tokenId, msg.sender);
+    emit OfferCancelled(_offerId, currentOffer.tokenId, currentOffer.user);
   }
 
 /************************************************************************ 普通模式下 按标价购买 ***************************************************************/

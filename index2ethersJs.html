@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>OneRingNFT front-end</title>
+  <script language="javascript" type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script language="javascript" type="text/javascript" src="./src/js/OnRingNFTMarketplaceABI.js"></script>
+  <script language="javascript" type="text/javascript" src="./src/js/OneRingNFTABI.js"></script>
+  <!-- 会导出一个全局的变量: ethers -->
+  <script src="https://cdn.ethers.io/scripts/ethers-v4.min.js" charset="utf-8" type="text/javascript">
+  </script>
+</head>
+
+<body>
+  <div id="BalancesOfAddr"></div>
+  <div id="txStatus"></div>
+  <div id="ConnectedAccount"></div>
+
+  <script>
+
+
+    //https://ropsten.etherscan.io/tx/0x2975cb9d8c60dc6c5b73877edb5adc26be24cddb8a85f3ed993b22edcdf4e42d
+    var OneRingNFTContract;
+    var OneRingNFTAddress = "0x818813363419e5274123e6964f4bb7e6391b6b20";
+
+    function startApp() {
+
+      //test ethers.js
+      let privateKey = "0xa50419f1862215f5f64168246e978da104b649b7beca8b2bc91227cfc8424853";
+      let wallet = new ethers.Wallet(privateKey);
+      console.log(wallet.address);
+
+      ethers.utils.id("Transfer(address,address,uint256)");
+      let provider = ethers.getDefaultProvider('ropsten');
+      //let provider = new ethers.providers.Web3Provider(web3.currentProvider);
+      OneRingNFTContract = new ethers.Contract(OneRingNFTAddress, oneRingNftABI, provider);
+
+      ethers.utils.id("safeMint(address,address,uint256)");
+      // indexed 的字段可以作为参数加⼊到过滤器中
+      let filter = OneRingNFTContract.filters.Transfer();
+      // 选择区块区间
+      filter.fromBlock = 11050221;
+      filter.toBlock = 13070221; // "latest";
+      // 获取⽇志
+      let logs = provider.getLogs(filter);
+      console.log(logs)
+      
+    }
+
+    startApp();
+
+  </script>
+</body>
+
+</html>

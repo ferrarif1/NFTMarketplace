@@ -45,10 +45,11 @@ contract OneRingNFTMarketplace is Ownable {
   /*
   event事件 用于链上行为的通知
   */
-  event Offer( uint offerId, uint tokenId, address user, uint price, OfferStatus offerstatus);
-  event OfferFilled(uint offerId, uint tokenId, address newOwner);
-  event OfferCancelled(uint offerId, uint tokenId, address owner);
-  event ClaimFunds(address user, uint amount);
+  //fromuUer、newOwner、offerOwner都是offer的发起者
+  event OfferCreated( uint indexed offerId, uint indexed tokenId, address indexed fromuUer);
+  event OfferFilled(uint indexed offerId, uint indexed tokenId, address indexed newOwner);
+  event OfferCancelled(uint indexed offerId, uint indexed tokenId, address indexed offerOwner);
+  event ClaimFunds(address indexed user, uint indexed amount);
 
   //OneRingNFT合约的实例，用于调用相关铸造、转账等函数
   OneRingNFT oneRingNFT;
@@ -197,7 +198,7 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     //更新最佳Offer id
     tokenIdToBestOfferId[_tokenId] = newOfferId;
     //4.emit event
-    emit Offer(newOfferId, _tokenId, msg.sender, _price, OfferStatus.available);
+    emit OfferCreated(newOfferId, _tokenId, msg.sender);
   }
 
 /*
@@ -252,7 +253,7 @@ function changePriceForSimpleAuctionsType(uint _tokenId,  uint _price) public on
     //更新最佳Offer id
     tokenIdToBestOfferId[_tokenId] = newOfferId;
     //4.emit event
-    emit Offer(newOfferId, _tokenId, msg.sender, _price, OfferStatus.available);
+    emit OfferCreated(newOfferId, _tokenId, msg.sender);
   }
 /************************************************************************ 接受他人/拒绝他人/取消自己 Offer ***************************************************************/
 /*
@@ -322,7 +323,7 @@ cancel one's own Offer
     require(currentOffer.offerstatus == OfferStatus.available, 'Offer status should be available');
     currentOffer.offerstatus = OfferStatus.cancelled;
     userFunds[currentOffer.user] += currentOffer.price;
-    emit OfferCancelled(_offerId, currentOffer.tokenId, msg.sender);
+    emit OfferCancelled(_offerId, currentOffer.tokenId, currentOffer.user);
   }
 
 /************************************************************************ 普通模式下 按标价购买 ***************************************************************/

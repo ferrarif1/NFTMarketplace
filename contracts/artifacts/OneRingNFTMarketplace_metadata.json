@@ -20,13 +20,13 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "address",
 						"name": "user",
 						"type": "address"
 					},
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint256",
 						"name": "amount",
 						"type": "uint256"
@@ -39,58 +39,21 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint256",
 						"name": "offerId",
 						"type": "uint256"
 					},
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint256",
 						"name": "tokenId",
 						"type": "uint256"
 					},
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "address",
-						"name": "user",
-						"type": "address"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "price",
-						"type": "uint256"
-					},
-					{
-						"indexed": false,
-						"internalType": "enum OneRingNFTMarketplace.OfferStatus",
-						"name": "offerstatus",
-						"type": "uint8"
-					}
-				],
-				"name": "Offer",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "offerId",
-						"type": "uint256"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "tokenId",
-						"type": "uint256"
-					},
-					{
-						"indexed": false,
-						"internalType": "address",
-						"name": "owner",
+						"name": "offerOwner",
 						"type": "address"
 					}
 				],
@@ -101,19 +64,44 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint256",
 						"name": "offerId",
 						"type": "uint256"
 					},
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "uint256",
 						"name": "tokenId",
 						"type": "uint256"
 					},
 					{
-						"indexed": false,
+						"indexed": true,
+						"internalType": "address",
+						"name": "fromuUer",
+						"type": "address"
+					}
+				],
+				"name": "OfferCreated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "tokenId",
+						"type": "uint256"
+					},
+					{
+						"indexed": true,
 						"internalType": "address",
 						"name": "newOwner",
 						"type": "address"
@@ -881,27 +869,27 @@
 			]
 		},
 		"contracts/OneRingNFT.sol": {
-			"keccak256": "0x7cce85a89630aef092c77a8266af038ddb716dfbac61cb8d8adda08d5c57ac5f",
+			"keccak256": "0xe9accfb0d245b6310ddf943b97f5dce8733fda0f3dca9213a1d1d91dc95ffe1b",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://753322beccdd275b985a0f3c524426935f07eb5b9e50f6017cb9883a0526bcd4",
-				"dweb:/ipfs/QmfL6wW58fPCPwn386787YSshRzArEfzXafp5mhiz265AK"
+				"bzz-raw://ac7be8d6e600a1114b0b02d999abec383bab5694e6c9578b913c6694858b57ae",
+				"dweb:/ipfs/QmYGZn36Fc2ASBTrM6vM6u7e4nE5PA4eDHbRy2Bbxjvovs"
 			]
 		},
 		"contracts/OneRingNFTMarketplace.sol": {
-			"keccak256": "0x8efe02fd451bcc7183225da7fc9ac6f0312e304e22ad9bda0fa66ae838d50536",
+			"keccak256": "0xc3e8af470c3a6b3097225f8ef8c9081d22db9bf86a43e19cd38e7ec6a8c96736",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://8ea3b9c7313ff12c1d650d941393293bfd4e1e3d90d598d22e3d4b196710ce75",
-				"dweb:/ipfs/QmaPU5mnvYLHiFJT1CG77S5ywMNWxU7tNQiJCAQ8ASbEMu"
+				"bzz-raw://2459b964ceeb38d4d0b6bbcc5f72778702c14e6dd611558ad2947e16a39455f7",
+				"dweb:/ipfs/QmWKG4UhBcvqrwE69eCvfoCXQssXANE7HuE7AeBHopcncS"
 			]
 		},
 		"contracts/oracle.sol": {
-			"keccak256": "0x0c9a2120100af0478258a3101ac40eccc9b91653b573e27b1d22f0e8b1b46d04",
+			"keccak256": "0x22c8b8d0f4c75f90c3f0fe526c40fac8496c252c43fc4aa91610e8da2931a85e",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://a250d692f766e52296a91d1a99b3c56aa5607e5e974e810e17b4ba73780a43ee",
-				"dweb:/ipfs/Qmd1ftSBxYNiZLhnNvBJibgcfgPV1WAKtKEbGeB5aY3Drs"
+				"bzz-raw://082336c0a692caa0ea771bf96b12443cfe8a325fb0732570458bf9f955137f70",
+				"dweb:/ipfs/QmQibe9BWpfgEFspav4AVNGQ8am7cxg8z4LdzgjYwoNk9k"
 			]
 		}
 	},

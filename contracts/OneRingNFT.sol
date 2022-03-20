@@ -67,7 +67,7 @@ contract OneRingNFT is ERC721, ERC721Enumerable, Ownable{
     _safeMint(msg.sender, newItemId);
     _tokenURIExists[_tokenURI] = true;
   }
-  
+  /*             NFT加入到Collection              */
   /*
   NFT加入到Collection 
   @tokenId NFT的id

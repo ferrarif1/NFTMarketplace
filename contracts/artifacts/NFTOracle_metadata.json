@@ -43,6 +43,37 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "arrayLimit",
+				"outputs": [
+					{
+						"internalType": "uint16",
+						"name": "",
+						"type": "uint16"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256[]",
+						"name": "_ID",
+						"type": "uint256[]"
+					},
+					{
+						"internalType": "bool[]",
+						"name": "_result",
+						"type": "bool[]"
+					}
+				],
+				"name": "batchDetectNFT",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "string",
@@ -261,11 +292,11 @@
 			]
 		},
 		"contracts/oracle.sol": {
-			"keccak256": "0xb54f28313f4be0ba1b36b8f9c2cb971a96b56faf7040db6f6bae39eb72907a05",
+			"keccak256": "0x6b95e3a9b11ae2eaff459064943bbc157241247929e6757980c3a3ea0553d154",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://cab41231e3350934152921c780a1b068badcbd59e514e7d4508fd56c57c816db",
-				"dweb:/ipfs/QmPSALBvtGKyn6SJ2HzXbk5q91XQhsXpVcpngRxkPttfGG"
+				"bzz-raw://a1bd78a9527ddca441e23fae76b96a66718425403c6e0aee8063919aadbfc44c",
+				"dweb:/ipfs/QmREpEeYjVepSVKKR8w1m7wTyf8RgcWS3qcRjb9TNm58zJ"
 			]
 		}
 	},

@@ -833,19 +833,19 @@
 			]
 		},
 		"contracts/OneRingNFT.sol": {
-			"keccak256": "0xe9accfb0d245b6310ddf943b97f5dce8733fda0f3dca9213a1d1d91dc95ffe1b",
+			"keccak256": "0xcf9abfd4c617d1b5ff0adca7123eb0a50bfcd3598eca6f8f739fe90b7246d560",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ac7be8d6e600a1114b0b02d999abec383bab5694e6c9578b913c6694858b57ae",
-				"dweb:/ipfs/QmYGZn36Fc2ASBTrM6vM6u7e4nE5PA4eDHbRy2Bbxjvovs"
+				"bzz-raw://b652f3005a1c6b577124706f5831c712cca0fb14dfdae6cc1ba571d2330c3ac4",
+				"dweb:/ipfs/QmbWCmKUT6oSar67MWzaqkWmMwGKJkyLwCSjhpAzf19paG"
 			]
 		},
 		"contracts/oracle.sol": {
-			"keccak256": "0xb54f28313f4be0ba1b36b8f9c2cb971a96b56faf7040db6f6bae39eb72907a05",
+			"keccak256": "0x81fef4ec7eb335d8f27479907263403126eb9af72fedd9f305fec5a66ed46921",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://cab41231e3350934152921c780a1b068badcbd59e514e7d4508fd56c57c816db",
-				"dweb:/ipfs/QmPSALBvtGKyn6SJ2HzXbk5q91XQhsXpVcpngRxkPttfGG"
+				"bzz-raw://77178e79d16551f2b7546e40fdd072543e03203a371a20751bf9a97ed5018e89",
+				"dweb:/ipfs/QmWdF5QAy8Ft47xFxmw2g1GKv2U9m9yiB8cuJLmUf15VZE"
 			]
 		}
 	},

@@ -34,10 +34,10 @@
 	},
 	"sources": {
 		"oracle_flat.sol": {
-			"keccak256": "0x8511cd18082822fb215bc010529831dcfbaa1953070104a67b363157f55b2543",
+			"keccak256": "0xf15c43d5ee28850b4f1b3ce7e997cfc18164d73671c5eeb0956114e9ba283932",
 			"urls": [
-				"bzz-raw://34a67b71990cbcdc6c87ed0e2f7da732f9ba62830442fdd74bc8000d8a8e96ff",
-				"dweb:/ipfs/QmXr37ReCzTzuq3coSA7qqhy96AxT9DaDP72EzpfKHmfmy"
+				"bzz-raw://25766e1e0a67541382a8e6a46e95d8dff829ce29fe1e5b85cab852e14fdfa3d7",
+				"dweb:/ipfs/QmY9JtSnhfVj9wvsHj7kmAGATowuyRvmb5Q6HCtWabHys6"
 			]
 		}
 	},

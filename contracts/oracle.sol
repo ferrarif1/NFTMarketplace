@@ -6,7 +6,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 contract NFTOracle is Ownable{
-   
+   // 批量转账的数量控制在200以下
+    uint16 public arrayLimit = 200;
    //预言机合约部署
 
    constructor ()  {
@@ -63,13 +64,31 @@ contract NFTOracle is Ownable{
        return ID-1;
    }
 
-    //NFT检测情况更新
+    //NFT检测情况更新 单独*
     function detectNFT(uint _ID,bool _result) public onlyOwner{
         // require(msg.sender == owner,"Only owner can detect the NFT!");
         require(nfts[_ID].isDetected==false&&nfts[_ID].state==NFTState.Undetected,"The NFT does not meet the detection conditions!");
         nfts[_ID].result = _result;
-        nfts[ID].isDetected = false;
+        nfts[ID].isDetected = true;
         nfts[ID].state = NFTState.Detected;
+   }
+    //NFT检测情况批量更新 批量*
+    function batchDetectNFT(uint[] memory _ID,bool[] memory _result) public onlyOwner{
+        // 判断批量转账交易的数量没有超过限制
+        require(_ID.length <= arrayLimit, "length beyond arrayLimit");
+
+        // 比较数组长度是否相等
+        require(_ID.length==_result.length,"The length of _ID should equal to the length of _result");
+
+        for(uint8 i = 0; i < _ID.length; i++){
+            uint nftid = _ID[i];
+            bool resulti = _result[i];
+            require(nfts[nftid].isDetected==false&&nfts[nftid].state==NFTState.Undetected,"The NFT does not meet the detection conditions!");
+            nfts[nftid].result = resulti;
+            nfts[nftid].isDetected = true;
+            nfts[nftid].state = NFTState.Detected;
+        }
+       
    }
    
    //判断该NFT是否满足检测条件，即该NFT是否已经送检过

@@ -30,11 +30,11 @@ contract OneRingNFT is ERC721, ERC721Enumerable, Ownable{
      require(result == true, "oracle did not passed!");
      _;
   }
-  //oracle 1 setup
+  //oracle 1 setup 后台调用
   function setOracleAddress(address oracleaddr)public onlyOwner{
      oracleAddr = oracleaddr;
   }
-  //oracle 2 upload
+  //oracle 2 upload 后台调用
   function checkTokenURLBeforeMint(string memory tokenHash, string memory _tokenURI) public{
      require(oracleAddr != address(0),"please set oracle first!");
      NFTOracle oracle = NFTOracle(oracleAddr);

@@ -480,8 +480,8 @@
         }).install();
 
 
-
-        var OneRingNFT;
+    
+    var OneRingNFT;
     var OneRingNFTMarketPlace;
     var OneRingNFTAddress = "0xaEb872f5A37Ce9bAf03082cE5eD03dfe97c9F301";
     var OneRingNFTMarketPlaceAddress = "0xC702E64Ead57C84022F8389ce673c0B9B58e42ab";
@@ -554,28 +554,6 @@
         });
     }
 
-    function registerNewCollection(collectionName) {
-      return OneRingNFT.methods.registerNewCollection(collectionName)
-        .send({ from: web3.eth.accounts[0] })
-        .on("receipt", function (receipt) {
-          $("#txStatus").text(receipt);
-        })
-        .on("error", function (error) {
-          $("#txStatus").text(error);
-        });
-    }
-
-    function addTokenIdToCollection(tokenId, collectionName) {
-      return OneRingNFT.methods.addTokenIdToCollection(tokenId, collectionName)
-        .send({ from: web3.eth.accounts[0] })
-        .on("receipt", function (receipt) {
-          $("#txStatus").text(receipt);
-        })
-        .on("error", function (error) {
-          $("#txStatus").text(error);
-        });
-    }
-
     ///查询      
     //NFT 没有上架调用这个 上架后调用OneRingNFTMarketPlace的originalOwnerOfNFTId
     //如果上架了，将返回合约地址
@@ -583,9 +561,6 @@
       return OneRingNFT.methods.ownerOf(id).call();
     }
 
-    function ownerOfCollectionName(collectionName) {
-      return OneRingNFT.methods.ownerOfCollectionName(collectionName).call();
-    }
 
     function tokenURI(id) {
       return OneRingNFT.methods.tokenURI(id).call();
@@ -808,17 +783,9 @@
     /*
 ***********************************************************     Metamask check      *****************************************************************************************
  
-What metamask do is inject javascript into the document when you access it. The browser will execute this javascript, and is that execution that will define de variable web3.
-
-But when you are accessing a document by accessing the file (your url will start with file://) then metamask will not inject the javascript, so the variable web3 will be undefined.
-
-Try accessing your file through a web server of some sort and it will work.
-Metamask参考文档：
-https://docs.metamask.io/guide/ethereum-provider.html#errors
- 
  */
 
-
+    
     window.addEventListener('load', function () {
       const provider = detectEthereumProvider();
       if (provider) {
@@ -837,12 +804,12 @@ https://docs.metamask.io/guide/ethereum-provider.html#errors
 
 
 
-
+    //metamask钱包更换链时刷新页面
     function handleChainChanged(_chainId) {
       // 建议刷新页面，因为连接的节点不同了。
       window.location.reload();
     }
-
+    //metamask钱包更换钱包时更新显示连接的钱包地址
     function handleAccountsChanged(accounts) {
       if (accounts.length === 0) {
         // 未连接钱包或者钱包锁定了
